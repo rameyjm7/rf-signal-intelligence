@@ -9,7 +9,6 @@ from scipy.io import loadmat
 from sklearn.metrics import accuracy_score
 from tensorflow.keras.models import load_model
 
-
 RML2018_MODEL = "rml2018/rml2018_lstm_rnn.keras"
 DEEPRADAR_MODEL = "deepradar2022/deepradar2022_cnn_bilstm_final.keras"
 

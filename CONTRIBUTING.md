@@ -15,6 +15,14 @@ Optional sanity check:
 python -m ml_wireless_classification --help
 ```
 
+Lint/format checks:
+
+```bash
+ruff check src tests
+ruff format src tests
+pytest -q -m "not integration"
+```
+
 ## Branching
 
 - Create feature branches from `main` (or the active integration branch when coordinated).
@@ -40,6 +48,12 @@ This repository contains large datasets and model artifacts.
 - Do not add new large binary files unless they are required and intentionally versioned.
 - Keep generated outputs out of commits where possible.
 - Prefer updating `.gitignore` for local experiment outputs.
+- Runtime outputs belong under `outputs/` unless a task explicitly requires another path.
+
+## Registries
+
+- Keep dataset metadata in `configs/data_registry.yaml`.
+- Keep model metadata in `configs/model_registry.yaml` (including input/output shapes).
 
 ## Notebooks
 

@@ -41,8 +41,10 @@ src/ml_wireless_classification/   Python package
   models/                         Maintained model definitions
   legacy/                         Experimental utilities kept for archive notebooks
   base/                           Backward-compatible import wrappers
+configs/                          Dataset and model registries (YAML)
 data/                             Datasets (RML2016, RML2018, DeepRadar2022)
 models/                           Saved model artifacts
+outputs/                          Generated runtime outputs (stats, logs, new artifacts)
 notebooks/                        Reproducible notebooks
 docker/                           Docker and Apptainer build/runtime files
 docs/                             Project reports and papers
@@ -174,6 +176,27 @@ Useful flags:
 - `--model-name <artifact-prefix>`
 - `--models-dir <output-dir>`
 - `--stats-dir <output-dir>`
+- `--outputs-dir <output-root>`
+
+Defaults:
+- Stats/logs are written under `outputs/`.
+- If `models/<model-name>.keras` already exists, CLI will use it by default for compatibility.
+- Otherwise, model artifacts default to `outputs/models/`.
+
+## Testing
+
+Fast checks:
+
+```bash
+ruff check src tests
+pytest -q -m "not integration"
+```
+
+Integration checks (local datasets/models required):
+
+```bash
+pytest -q -m integration
+```
 
 ## Docker
 

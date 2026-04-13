@@ -7,7 +7,6 @@ from sklearn.metrics import accuracy_score
 from sklearn.preprocessing import LabelEncoder
 from tensorflow.keras.models import load_model
 
-
 MODEL_CANDIDATES = [
     "rml2016/rml2016_lstm_rnn_2024.keras",
     "rml2016/rml2016_rnn_lstm_with_snr_5_2_1.keras",

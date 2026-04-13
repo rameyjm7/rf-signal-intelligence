@@ -1,0 +1,37 @@
+version: 1
+models:
+  - id: rml2016_lstm_rnn_2024
+    dataset: rml2016
+    path: models/rml2016/rml2016_lstm_rnn_2024.keras
+    architecture: LSTM-RNN
+    description: Baseline RML2016 recurrent classifier with SNR as a third input channel.
+    input_shape: [128, 3]
+    output_shape: [null, 11]
+    labels_source: data/RML2016/RML2016.10a_dict.pkl
+
+  - id: rml2016_rnn_lstm_with_snr_5_2_1
+    dataset: rml2016
+    path: models/rml2016/rml2016_rnn_lstm_with_snr_5_2_1.keras
+    architecture: LSTM-RNN
+    description: Alternate RML2016 recurrent checkpoint used for max-SNR regression checks.
+    input_shape: [128, 3]
+    output_shape: [null, 11]
+    labels_source: data/RML2016/RML2016.10a_dict.pkl
+
+  - id: rml2018_lstm_rnn
+    dataset: rml2018
+    path: models/rml2018/rml2018_lstm_rnn.keras
+    architecture: LSTM-RNN
+    description: RML2018 model trained on I/Q plus SNR channel for 24-way modulation prediction.
+    input_shape: [1024, 3]
+    output_shape: [null, 24]
+    labels_source: data/RML2018/classes-fixed.txt
+
+  - id: deepradar2022_cnn_bilstm_final
+    dataset: deepradar2022
+    path: models/deepradar2022/deepradar2022_cnn_bilstm_final.keras
+    architecture: CNN-BiLSTM
+    description: DeepRadar2022 hybrid model evaluated using IQ and derived envelope channels.
+    input_shape: [1024, 3]
+    output_shape: [null, 17]
+    labels_source: data/DeepRadar2022/lbl_test.mat

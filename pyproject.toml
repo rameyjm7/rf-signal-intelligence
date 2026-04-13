@@ -1,0 +1,59 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ml_wireless_classification"
+version = "0.1.0"
+description = "ML Wireless Classification"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { file = "LICENSE" }
+authors = [
+  { name = "Jacob Ramey", email = "rameyjm7@gmail.com" },
+]
+dependencies = [
+  "scikit-learn",
+  "tensorflow",
+  "numpy",
+  "matplotlib",
+  "seaborn",
+  "scipy",
+  "PyWavelets",
+]
+
+[project.scripts]
+start = "ml_wireless_classification:create_app"
+ml-wireless-classification = "ml_wireless_classification:main"
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+src = ["src", "tests"]
+exclude = [
+  "archive",
+  "data",
+  "docs",
+  "models",
+  "notebooks",
+  "src/ml_wireless_classification/base",
+  "src/ml_wireless_classification/legacy",
+  "src/ml_wireless_classification/core/base_classifier.py",
+  "src/ml_wireless_classification/models/rnn_lstm_with_snr.py",
+  "src/ml_wireless_classification/__about__.py",
+]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP"]
+ignore = ["E501"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+line-ending = "lf"
