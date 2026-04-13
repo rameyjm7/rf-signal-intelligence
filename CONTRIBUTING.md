@@ -6,7 +6,8 @@
 python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install --upgrade pip
-pip install -e .
+pip install -e ".[dev,test]"
+pre-commit install
 ```
 
 Optional sanity check:
@@ -21,6 +22,12 @@ Lint/format checks:
 ruff check src tests
 ruff format src tests
 pytest -q -m "not integration"
+```
+
+Optional integration checks:
+
+```bash
+python -m pytest -q -m integration -rs
 ```
 
 ## Branching
@@ -40,6 +47,8 @@ pytest -q -m "not integration"
 - Summarize what changed and why.
 - Call out runtime impacts (training behavior, data paths, model artifacts, Docker behavior).
 - Include reproducible commands for validation.
+- Keep pre-commit clean before pushing:
+  - `pre-commit run --all-files`
 
 ## Data and Artifacts
 
@@ -54,6 +63,8 @@ This repository contains large datasets and model artifacts.
 
 - Keep dataset metadata in `configs/data_registry.yaml`.
 - Keep model metadata in `configs/model_registry.yaml` (including input/output shapes).
+- Keep checksum metadata (`checksum.algorithm`, `checksum.value`) present for each registry entry.
+- Use `python scripts/update_registry_checksums.py` to refresh checksum values.
 
 ## Notebooks
 
@@ -65,6 +76,11 @@ This repository contains large datasets and model artifacts.
 - Prioritize reliability and reproducibility.
 - Avoid unrelated refactors in the same change.
 - Update documentation whenever CLI behavior, setup, or runtime paths change.
+
+## Release Policy
+
+- Follow `RELEASE.md` for version bumps, tagging, and release notes.
+- Update `CHANGELOG.md` in every PR that changes behavior, interfaces, or outputs.
 
 ## Source Layout
 

@@ -9,6 +9,8 @@ from scipy.io import loadmat
 from sklearn.metrics import accuracy_score
 from tensorflow.keras.models import load_model
 
+from tests.integration_policy import require_paths
+
 RML2018_MODEL = "rml2018/rml2018_lstm_rnn.keras"
 DEEPRADAR_MODEL = "deepradar2022/deepradar2022_cnn_bilstm_final.keras"
 
@@ -36,8 +38,10 @@ def test_rml2018_highest_snr_accuracy():
     classes_file = repo / "data" / "RML2018" / "classes.txt"
     fixed_classes_file = repo / "data" / "RML2018" / "classes-fixed.txt"
 
-    if not data_file.exists() or not model_file.exists():
-        pytest.skip("Missing RML2018 data/model artifacts.")
+    require_paths(
+        "RML2018",
+        [data_file, model_file, classes_file, fixed_classes_file],
+    )
 
     original_classes = _classes_from_python_file(classes_file)
     fixed_classes = _classes_from_python_file(fixed_classes_file)
@@ -92,8 +96,10 @@ def test_deepradar2022_highest_snr_accuracy():
     lbl_file = repo / "data" / "DeepRadar2022" / "lbl_test.mat"
     model_file = repo / "models" / DEEPRADAR_MODEL
 
-    if not x_file.exists() or not y_file.exists() or not lbl_file.exists() or not model_file.exists():
-        pytest.skip("Missing DeepRadar2022 data/model artifacts.")
+    require_paths(
+        "DeepRadar2022",
+        [x_file, y_file, lbl_file, model_file],
+    )
 
     y_mat = loadmat(y_file)
     lbl_mat = loadmat(lbl_file)

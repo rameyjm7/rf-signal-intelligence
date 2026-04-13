@@ -7,6 +7,8 @@ from sklearn.metrics import accuracy_score
 from sklearn.preprocessing import LabelEncoder
 from tensorflow.keras.models import load_model
 
+from tests.integration_policy import require_paths
+
 MODEL_CANDIDATES = [
     "rml2016/rml2016_lstm_rnn_2024.keras",
     "rml2016/rml2016_rnn_lstm_with_snr_5_2_1.keras",
@@ -74,11 +76,7 @@ def test_max_snr_samples_are_classified_with_strong_accuracy():
     repo_root = _repo_root()
     data_path = repo_root / "data" / "RML2016" / "RML2016.10a_dict.pkl"
     models_dir = repo_root / "models"
-
-    if not data_path.exists():
-        pytest.skip(f"Missing dataset: {data_path}")
-    if not models_dir.exists():
-        pytest.skip(f"Missing model directory: {models_dir}")
+    require_paths("RML2016", [data_path, models_dir])
 
     data = _load_rml2016_data(data_path)
     x_max_snr, labels, max_snr = _build_max_snr_batch(data)

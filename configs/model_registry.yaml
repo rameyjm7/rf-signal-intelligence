@@ -8,6 +8,9 @@ models:
     input_shape: [128, 3]
     output_shape: [null, 11]
     labels_source: data/RML2016/RML2016.10a_dict.pkl
+    checksum:
+      algorithm: sha256
+      value: null
 
   - id: rml2016_rnn_lstm_with_snr_5_2_1
     dataset: rml2016
@@ -17,6 +20,9 @@ models:
     input_shape: [128, 3]
     output_shape: [null, 11]
     labels_source: data/RML2016/RML2016.10a_dict.pkl
+    checksum:
+      algorithm: sha256
+      value: null
 
   - id: rml2018_lstm_rnn
     dataset: rml2018
@@ -26,6 +32,9 @@ models:
     input_shape: [1024, 3]
     output_shape: [null, 24]
     labels_source: data/RML2018/classes-fixed.txt
+    checksum:
+      algorithm: sha256
+      value: null
 
   - id: deepradar2022_cnn_bilstm_final
     dataset: deepradar2022
@@ -33,5 +42,8 @@ models:
     architecture: CNN-BiLSTM
     description: DeepRadar2022 hybrid model evaluated using IQ and derived envelope channels.
     input_shape: [1024, 3]
-    output_shape: [null, 17]
+    output_shape: [null, 23]
     labels_source: data/DeepRadar2022/lbl_test.mat
+    checksum:
+      algorithm: sha256
+      value: null
