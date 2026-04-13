@@ -28,11 +28,48 @@ jobs:
         run: ruff check src tests
 
       - name: Unit tests (non-integration)
-        run: pytest -q -m "not integration"
+        run: |
+          mkdir -p reports
+          pytest -q -m "not integration" -rs --junitxml=reports/pytest-unit.xml
+
+      - name: Upload unit test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pytest-unit-report
+          path: reports/pytest-unit.xml
+
+      - name: Publish unit test results
+        if: always()
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        with:
+          files: reports/pytest-unit.xml
+
+  pylint:
+    runs-on: ubuntu-latest
+    needs: test
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .
+          pip install pylint
+
+      - name: Pylint
+        run: pylint src/ml_wireless_classification
 
   integration:
     runs-on: ubuntu-latest
-    needs: test
+    needs: [test, pylint]
 
     steps:
       - name: Checkout
@@ -50,4 +87,19 @@ jobs:
           pip install pytest ruff
 
       - name: Integration tests (CPU, may skip if artifacts are missing)
-        run: pytest -q -m integration -rs
+        run: |
+          mkdir -p reports
+          pytest -q -m integration -rs --junitxml=reports/pytest-integration.xml
+
+      - name: Upload integration test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pytest-integration-report
+          path: reports/pytest-integration.xml
+
+      - name: Publish integration test results
+        if: always()
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        with:
+          files: reports/pytest-integration.xml
