@@ -25,7 +25,7 @@ from sklearn.model_selection import train_test_split
 
 DEBUG = True
 USE_GAN_GENERATED_SAMPLES = True
-GAN_MODEL_TO_LOAD = 'RMLGAN2_model_9270.keras'
+GAN_MODEL_TO_LOAD = 'models/rml2016/rml2016_gan_model_9270.keras'
 LOAD_EXISTING_MODEL = False
 
 MODEL_SAVE_PATH = "RNNBASE_rnn_model.keras"

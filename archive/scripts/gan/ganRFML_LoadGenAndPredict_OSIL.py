@@ -29,7 +29,7 @@ from tensorflow.keras.losses import BinaryCrossentropy, CategoricalCrossentropy,
 
 DEBUG = True
 USE_GAN_GENERATED_SAMPLES = False
-GAN_MODEL_TO_LOAD = 'RMLGAN2_model_9270.keras'
+GAN_MODEL_TO_LOAD = 'models/rml2016/rml2016_gan_model_9270.keras'
 LOAD_EXISTING_MODEL = False
 
 MODEL_SAVE_PATH = "RNNOSIL_rnn_model.keras"
