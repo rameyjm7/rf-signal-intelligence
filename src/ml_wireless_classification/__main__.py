@@ -2,8 +2,8 @@ import argparse
 import faulthandler
 from pathlib import Path
 
-from ml_wireless_classification.base.CommonVars import RUN_MODE, common_vars
-from ml_wireless_classification.rnn_lstm_w_SNR import ModulationLSTMClassifier
+from ml_wireless_classification.core.run_mode import RUN_MODE, common_vars
+from ml_wireless_classification.models.rnn_lstm_with_snr import ModulationLSTMClassifier
 
 faulthandler.enable()
 
