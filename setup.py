@@ -13,11 +13,14 @@ setup(
         "tensorflow",
         "numpy",
         "matplotlib",
+        "seaborn",
+        "scipy",
         "PyWavelets",
     ],
     entry_points={
         "console_scripts": [
-            "start=ml_wireless_classification.__init__:create_app",
+            "start=ml_wireless_classification:create_app",
+            "ml-wireless-classification=ml_wireless_classification:main",
         ],
     },
 )
