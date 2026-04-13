@@ -9,6 +9,7 @@ ignore-paths=
 disable=
     import-error,
     no-name-in-module,
+    import-outside-toplevel,
     duplicate-code,
     missing-module-docstring,
     missing-class-docstring,

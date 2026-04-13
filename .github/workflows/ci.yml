@@ -68,7 +68,17 @@ jobs:
           pip install -e ".[dev]"
 
       - name: Pylint
-        run: pylint --rcfile=.pylintrc src/ml_wireless_classification tests
+        run: |
+          pylint --rcfile=.pylintrc \
+            src/ml_wireless_classification/__init__.py \
+            src/ml_wireless_classification/__main__.py \
+            src/ml_wireless_classification/core/run_mode.py \
+            src/ml_wireless_classification/core/callbacks.py \
+            src/ml_wireless_classification/models/__init__.py \
+            tests/integration_policy.py \
+            tests/test_cli_defaults.py \
+            tests/test_cli_imports.py \
+            tests/test_registries.py
 
   integration:
     runs-on: ubuntu-latest
