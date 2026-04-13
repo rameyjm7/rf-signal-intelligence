@@ -3,7 +3,6 @@ import faulthandler
 from pathlib import Path
 
 from ml_wireless_classification.core.run_mode import RUN_MODE, common_vars
-from ml_wireless_classification.models.rnn_lstm_with_snr import ModulationLSTMClassifier
 
 faulthandler.enable()
 
@@ -23,6 +22,22 @@ def _default_data_path(repo_root: Path) -> Path:
         if path.exists():
             return path
     return candidates[0]
+
+
+def _default_outputs_root(repo_root: Path) -> Path:
+    return repo_root / "outputs"
+
+
+def _resolve_models_dir(repo_root: Path, model_name: str, explicit: str | None) -> Path:
+    if explicit:
+        return Path(explicit).expanduser().resolve()
+
+    legacy_models_dir = repo_root / "models"
+    legacy_model_path = legacy_models_dir / f"{model_name}.keras"
+    if legacy_model_path.exists():
+        return legacy_models_dir
+
+    return _default_outputs_root(repo_root) / "models"
 
 
 def _build_parser() -> argparse.ArgumentParser:
@@ -48,12 +63,20 @@ def _build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--models-dir",
         default=None,
-        help="Directory for saved model artifacts. Defaults to <repo>/models.",
+        help=(
+            "Directory for model artifacts. Defaults to <repo>/models if an existing model "
+            "matches --model-name, otherwise <repo>/outputs/models."
+        ),
     )
     parser.add_argument(
         "--stats-dir",
         default=None,
-        help="Directory for stats artifacts. Defaults to <repo>/stats.",
+        help="Directory for stats artifacts. Defaults to <repo>/outputs/stats.",
+    )
+    parser.add_argument(
+        "--outputs-dir",
+        default=None,
+        help="Root directory for generated outputs. Defaults to <repo>/outputs.",
     )
     return parser
 
@@ -61,31 +84,36 @@ def _build_parser() -> argparse.ArgumentParser:
 def main() -> None:
     args = _build_parser().parse_args()
     repo_root = _repo_root()
+    outputs_root = (
+        Path(args.outputs_dir).expanduser().resolve()
+        if args.outputs_dir
+        else _default_outputs_root(repo_root)
+    )
 
     data_path = (
         Path(args.data_path).expanduser().resolve()
         if args.data_path
         else _default_data_path(repo_root)
     )
-    models_dir = (
-        Path(args.models_dir).expanduser().resolve()
-        if args.models_dir
-        else repo_root / "models"
-    )
+    models_dir = _resolve_models_dir(repo_root, args.model_name, args.models_dir)
     stats_dir = (
         Path(args.stats_dir).expanduser().resolve()
         if args.stats_dir
-        else repo_root / "stats"
+        else outputs_root / "stats"
     )
+    logs_dir = outputs_root / "logs"
 
     models_dir.mkdir(parents=True, exist_ok=True)
     stats_dir.mkdir(parents=True, exist_ok=True)
+    logs_dir.mkdir(parents=True, exist_ok=True)
 
     model_path = models_dir / f"{args.model_name}.keras"
     stats_path = stats_dir / f"{args.model_name}_stats.json"
 
+    common_vars.outputs_dir = str(outputs_root)
     common_vars.models_dir = str(models_dir)
     common_vars.stats_dir = str(stats_dir)
+    common_vars.logs_dir = str(logs_dir)
 
     if not data_path.exists():
         raise FileNotFoundError(
@@ -96,6 +124,9 @@ def main() -> None:
     print(f"Data path: {data_path}")
     print(f"Model path: {model_path}")
     print(f"Stats path: {stats_path}")
+
+    # Delay model import until runtime; keeps `--help` and simple CLI actions lightweight.
+    from ml_wireless_classification.models.rnn_lstm_with_snr import ModulationLSTMClassifier
 
     classifier = ModulationLSTMClassifier(
         str(data_path), str(model_path), str(stats_path)

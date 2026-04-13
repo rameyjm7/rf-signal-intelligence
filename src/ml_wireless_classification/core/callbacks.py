@@ -1,5 +1,6 @@
 
-from tensorflow.keras.callbacks import EarlyStopping, Callback
+from tensorflow.keras.callbacks import Callback
+
 
 class CustomEarlyStopping(Callback):
     def __init__(self, monitor="val_accuracy", min_delta=0.01, patience=5, restore_best_weights=True):
@@ -12,7 +13,7 @@ class CustomEarlyStopping(Callback):
         - patience (int): Number of epochs to wait after last improvement.
         - restore_best_weights (bool): Whether to restore the weights of the best epoch.
         """
-        super(CustomEarlyStopping, self).__init__()
+        super().__init__()
         self.monitor = monitor
         self.min_delta = min_delta
         self.patience = patience

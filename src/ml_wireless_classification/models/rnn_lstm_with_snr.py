@@ -412,10 +412,13 @@ if __name__ == "__main__":
         script_dir, "..", "..", "RML2016.10a_dict.pkl"
     )  # One level up from the script's directory
 
-    common_vars.stats_dir = os.path.join(script_dir, "stats")
-    common_vars.models_dir = os.path.join(script_dir, " models")
-    model_path = os.path.join(script_dir, "models", f"{model_name}.keras")
-    stats_path = os.path.join(script_dir, "stats", f"{model_name}_stats.json")
+    outputs_dir = os.path.join(script_dir, "..", "..", "..", "outputs")
+    common_vars.outputs_dir = outputs_dir
+    common_vars.logs_dir = os.path.join(outputs_dir, "logs")
+    common_vars.stats_dir = os.path.join(outputs_dir, "stats")
+    common_vars.models_dir = os.path.join(outputs_dir, "models")
+    model_path = os.path.join(common_vars.models_dir, f"{model_name}.keras")
+    stats_path = os.path.join(common_vars.stats_dir, f"{model_name}_stats.json")
 
     # Usage Example
     print("Data path:", data_path)

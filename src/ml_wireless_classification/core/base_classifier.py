@@ -58,7 +58,9 @@ class BaseModulationClassifier(ABC):
         }
         self.learning_rate = 0.0001  # Default learning rate
         self.load_stats()
-        self.log_dir = "logs/fit/" + datetime.now().strftime("%Y%m%d-%H%M%S")
+        self.log_dir = os.path.join(
+            common_vars.logs_dir, "fit", datetime.now().strftime("%Y%m%d-%H%M%S")
+        )
         self.load_data()
         self.run_tensorboard = True
 
@@ -262,6 +264,7 @@ class BaseModulationClassifier(ABC):
             "confusion_matrix",
             f"CM_{model_name}.png",
         )
+        os.makedirs(os.path.dirname(save_path), exist_ok=True)
         plt.savefig(save_path)
         print(f"Confusion matrix saved to {save_path}")
 
@@ -334,10 +337,6 @@ class BaseModulationClassifier(ABC):
         )  # Time steps and features (I, Q, SNR, BW)
         num_classes = len(np.unique(y_train))  # Number of unique modulation types
         self.build_model(input_shape, num_classes)
-        model_plot_path = os.path.join(
-            common_vars.models_dir, "plots", f"{self.get_model_name()}.png"
-        )
-
         if self.run_tensorboard:
             self.setup_tensorboard()
         return X_train, y_train, X_test, y_test
@@ -495,10 +494,6 @@ class BaseModulationClassifier(ABC):
         Saves the figure to the specified directory with the model name as the file name.
         Returns a dictionary of statistics such as accuracy over 5 dB and accuracy per SNR.
         """
-        # Get the directory of the current script
-        script_dir = os.path.dirname(os.path.abspath(__file__))
-        common_vars.stats_dir = os.path.join(script_dir, "..", "stats")
-
         model = self.model
 
         # --- Confusion Matrix for All SNR Levels ---
@@ -600,6 +595,7 @@ class BaseModulationClassifier(ABC):
 
         # Save the figure
         output_file = os.path.join(common_vars.stats_dir, f"{self.get_model_name()}_analysis.png")
+        os.makedirs(os.path.dirname(output_file), exist_ok=True)
         plt.savefig(output_file, dpi=300)
         print(f"Figure saved to {output_file}")
 
