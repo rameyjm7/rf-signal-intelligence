@@ -8,6 +8,9 @@ datasets:
     sample_shape: [128, 2]
     snr_handling: append_snr_as_feature_channel
     notes: Dictionary keyed by (modulation, snr).
+    checksum:
+      algorithm: sha256
+      value: null
 
   - id: rml2018
     name: RML2018.01A
@@ -18,6 +21,9 @@ datasets:
     snr_path: data/RML2018/GOLD_XYZ_OSC.0001_1024.hdf5::Z
     labels_path: data/RML2018/classes-fixed.txt
     snr_handling: append_snr_as_feature_channel
+    checksum:
+      algorithm: sha256
+      value: null
 
   - id: deepradar2022
     name: DeepRadar2022
@@ -29,3 +35,6 @@ datasets:
       lbl_test: data/DeepRadar2022/lbl_test.mat
     sample_shape: [1024, 2]
     derived_feature: iq_envelope_as_third_channel
+    checksum:
+      algorithm: sha256
+      value: null

@@ -144,6 +144,19 @@ python -m pip install --upgrade pip
 pip install -e .
 ```
 
+For contributor tooling (lint, tests, hooks):
+
+```bash
+pip install -e ".[dev,test]"
+pre-commit install
+```
+
+For GPU-focused environments (Linux):
+
+```bash
+pip install -e ".[gpu]"
+```
+
 ## Data
 
 By default, the CLI searches for:
@@ -192,10 +205,37 @@ ruff check src tests
 pytest -q -m "not integration"
 ```
 
+Full reproducibility command:
+
+```bash
+ruff check src tests && pytest -q -m "not integration" && pytest -q -m integration -rs
+```
+
 Integration checks (local datasets/models required):
 
 ```bash
 pytest -q -m integration
+```
+
+CI integration artifact policy:
+- Default policy is `skip_if_missing` (integration tests skip if artifacts are unavailable).
+- To enforce artifacts and fail instead of skip, set:
+
+```bash
+export INTEGRATION_ARTIFACT_POLICY=require
+```
+
+Registry-driven smoke evaluation:
+
+```bash
+python scripts/smoke_eval_registry.py
+python scripts/smoke_eval_registry.py --with-data --require-artifacts
+```
+
+To populate checksum values in registries from local artifacts:
+
+```bash
+python scripts/update_registry_checksums.py
 ```
 
 ## Docker
@@ -213,6 +253,7 @@ See [`docker/README.md`](docker/README.md) for Docker Hub and Apptainer/HPC usag
 
 - Large datasets and model artifacts are expected; this repository is data-heavy.
 - Working notebooks can produce uncommitted changes during experimentation.
+- Release/tag process is documented in `RELEASE.md`.
 
 ## Citation
 
