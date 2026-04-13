@@ -1,0 +1,22 @@
+[MASTER]
+ignore-paths=
+    ^src/ml_wireless_classification/base/.*$
+    ^src/ml_wireless_classification/legacy/.*$
+    ^src/ml_wireless_classification/core/base_classifier.py$
+    ^src/ml_wireless_classification/models/rnn_lstm_with_snr.py$
+
+[MESSAGES CONTROL]
+disable=
+    import-error,
+    no-name-in-module,
+    import-outside-toplevel,
+    duplicate-code,
+    too-few-public-methods,
+    too-many-instance-attributes,
+    missing-module-docstring,
+    missing-class-docstring,
+    missing-function-docstring,
+    invalid-name
+
+[FORMAT]
+max-line-length=100
