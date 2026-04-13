@@ -23,7 +23,7 @@ build:
 		data/ \
 		docs/ \
 		notebooks/ \
-		scratch/ \
+		archive/ \
 		setup.py \
 		LICENSE \
 		README.md 
