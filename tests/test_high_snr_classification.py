@@ -9,8 +9,8 @@ from tensorflow.keras.models import load_model
 
 
 MODEL_CANDIDATES = [
-    "lstm_rnn_2024.keras",
-    "rnn_lstm_w_SNR_5_2_1.keras",
+    "rml2016/rml2016_lstm_rnn_2024.keras",
+    "rml2016/rml2016_rnn_lstm_with_snr_5_2_1.keras",
 ]
 SAMPLES_PER_CLASS = 25
 MIN_HIGH_SNR_ACCURACY = 0.70
