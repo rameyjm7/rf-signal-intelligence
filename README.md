@@ -1,4 +1,5 @@
-# Wireless Signal Classification via Deep Learning
+# ML Wireless Signal Classification
+
 ![Python](https://img.shields.io/badge/Python-3.10-blue)
 ![TensorFlow](https://img.shields.io/badge/TensorFlow-2.x-orange)
 ![CUDA](https://img.shields.io/badge/CUDA-11.8-green)
@@ -6,76 +7,74 @@
 
 **Authors:** Jacob M. Ramey, Paras Goda
 
----
+Deep-learning workflows for wireless modulation classification, centered on RNN-LSTM models and related experiments.
 
-# Table of Contents
+## Table of Contents
 - [Overview](#overview)
-- [Repository Structure](#repository-structure)
+- [Repository Layout](#repository-layout)
 - [Datasets](#datasets)
 - [Results: RML2016](#results-rml2016)
 - [Results: RML2018](#results-rml2018)
 - [Results: DeepRadar2022](#results-deepradar2022)
-- [More to Come](#more-to-come)
-- [Installation](#installation)
+- [Requirements](#requirements)
+- [Local Setup](#local-setup)
+- [CLI Usage](#cli-usage)
+- [Docker](#docker)
+- [Notes](#notes)
 - [Citation](#citation)
 
----
+## Overview
 
-# Overview
+This repository contains training pipelines, evaluation notebooks, saved models, and documentation for deep-learning-based wireless signal classification.
 
-This repository contains the core training pipelines, evaluation scripts, models, and documentation for a set of deep‑learning–based modulation classification experiments.  
-The work combines practical engineering workflows (Docker, GPU training, reproducible pipelines) with structured experimentation across multiple wireless datasets.
+Implemented workflows include:
+- LSTM and BiLSTM architectures for raw I/Q modeling
+- CNN + recurrent hybrids for time-frequency structure
+- Cross-dataset experimentation on RML2016, RML2018, and DeepRadar2022
+- GPU-ready execution via Docker/Apptainer
 
-The implemented models span:
-- LSTM and BiLSTM architectures for raw I/Q modeling  
-- CNN front‑ends for frequency‑domain structure  
-- Dual‑head time–frequency fusion models  
-- AC‑GAN augmentation for SNR/class balancing  
-- Early transformer‑based spectral modeling  
+## Repository Layout
 
-The code supports large‑scale training (up to ~2M samples) and portable GPU environments via Docker and Apptainer.
-
----
-
-# Repository Structure
-
+```text
+src/ml_wireless_classification/   Python package
+  core/                           Maintained runtime/training components
+  models/                         Maintained model definitions
+  legacy/                         Experimental utilities kept for archive notebooks
+  base/                           Backward-compatible import wrappers
+configs/                          Dataset and model registries (YAML)
+data/                             Datasets (RML2016, RML2018, DeepRadar2022)
+models/                           Saved model artifacts
+outputs/                          Generated runtime outputs (stats, logs, new artifacts)
+notebooks/                        Reproducible notebooks
+docker/                           Docker and Apptainer build/runtime files
+docs/                             Project reports and papers
+tests/                            Test and integration checks
+archive/                          Archived experiments and prototype artifacts
 ```
-src/ml_wireless_classification/   Core training, preprocessing, OSIL, GAN modules
-notebooks/                        Reproducible training notebooks
-docker/                           CUDA-enabled Docker + Apptainer environment
-models/                           Trained .keras models
-docs/                             Technical reports and supporting materials
-```
 
----
+## Datasets
 
-# Datasets
+### RML2016.10A
+11 modulation types, SNR from -20 dB to +18 dB.
 
-### RML2016.10A  
-11 modulation types, SNR from −20 dB to +18 dB.
+### RML2018.01A
+24 classes; used for larger-scale training/evaluation and cross-dataset checks.
 
-### RML2018.01A  
-24 classes; used for cross‑dataset generalization and larger‑scale evaluation.
+### DeepRadar2022
+Radar waveform dataset used for CNN-BiLSTM style modeling and transfer evaluation.
 
-### DeepRadar2022  
-Radar waveform dataset used for CNN–BiLSTM hybrid models.
-
----
-
-# Results: RML2016
+## Results: RML2016
 
 ### Summary
-- Accuracy (all SNR): 67.8%  
-- Accuracy (SNR > 5 dB): 94%  
-- Macro F1: 0.68  
-- Weighted F1: 0.68  
+- Accuracy (all SNR): 67.8%
+- Accuracy (SNR > 5 dB): 94%
+- Macro F1: 0.68
+- Weighted F1: 0.68
 
 ### Confusion Matrix
 ![RML2016 Confusion Matrix](https://github.com/user-attachments/assets/6eebbb20-105d-4c9c-ba17-7f2ec11e070f)
 
----
-
-# Results: RML2018
+## Results: RML2018
 
 ### Overall Accuracy
 Approx. 72% across 72,000 evaluation samples.
@@ -85,7 +84,7 @@ Approx. 72% across 72,000 evaluation samples.
 
 ### Classification Report (All SNRs)
 
-```
+```text
 precision    recall  f1-score   support
 
 128APSK 0.36 0.16 0.23 3000
@@ -121,59 +120,142 @@ accuracy 0.72 72000
 ![RML2018 Image 2](https://github.com/user-attachments/assets/99d3b667-93d4-430e-abf3-aa6b4c743a31)
 ![RML2018 Image 3](https://github.com/user-attachments/assets/5e8d2c18-5c62-489e-84ea-8b2648eca610)
 
----
+## Results: DeepRadar2022
 
-# Results: DeepRadar2022
-
-### CNN–BiLSTM Hybrid Evaluation
+### CNN-BiLSTM Hybrid Evaluation
 
 ![DeepRadar Image 1](https://github.com/user-attachments/assets/a2e6d2dc-ef18-4bdd-a8c8-31d2bbb77a0f)
 ![DeepRadar Image 2](https://github.com/user-attachments/assets/68843377-7fc4-45ba-9f16-9a40b9ecc2c9)
 ![DeepRadar Image 3](https://github.com/user-attachments/assets/0754f4da-e8d6-4cd0-9627-056e932a2865)
 ![DeepRadar Image 4](https://github.com/user-attachments/assets/c9eb6c5b-737f-4273-ba68-0ac3d13e3aab)
 
----
+## Requirements
 
-# More to Come
+- Python 3.10+
+- `pip`
+- Optional: NVIDIA GPU stack for accelerated TensorFlow runs
 
-Future additions planned:
+## Local Setup
 
-- Expanded DeepRadar model cards  
-- Transformer-based spectral/temporal modeling  
-- Cross-dataset robustness tests  
-- Real-time inference deployment on edge hardware  
-
----
-
-# Installation
-
-### Docker (GPU)
-
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+pip install -e .
 ```
-cd docker
+
+For contributor tooling (lint, tests, hooks):
+
+```bash
+pip install -e ".[dev,test]"
+pre-commit install
+```
+
+For GPU-focused environments (Linux):
+
+```bash
+pip install -e ".[gpu]"
+```
+
+## Data
+
+By default, the CLI searches for:
+- `data/RML2016/RML2016.10a_dict.pkl`
+- `RML2016.10a_dict.pkl` (repository root)
+
+If your dataset is elsewhere, pass `--data-path`.
+
+## CLI Usage
+
+Run as module:
+
+```bash
+python -m ml_wireless_classification --mode evaluate_only
+```
+
+Or installed console script:
+
+```bash
+ml-wireless-classification --mode evaluate_only
+```
+
+Supported modes:
+- `train`
+- `train_continuously`
+- `evaluate_only` (default)
+
+Useful flags:
+- `--data-path <path-to-RML2016.10a_dict.pkl>`
+- `--model-name <artifact-prefix>`
+- `--models-dir <output-dir>`
+- `--stats-dir <output-dir>`
+- `--outputs-dir <output-root>`
+
+Defaults:
+- Stats/logs are written under `outputs/`.
+- If `models/<model-name>.keras` already exists, CLI will use it by default for compatibility.
+- Otherwise, model artifacts default to `outputs/models/`.
+
+## Testing
+
+Fast checks:
+
+```bash
+ruff check src tests
+pytest -q -m "not integration"
+```
+
+Full reproducibility command:
+
+```bash
+ruff check src tests && pytest -q -m "not integration" && pytest -q -m integration -rs
+```
+
+Integration checks (local datasets/models required):
+
+```bash
+pytest -q -m integration
+```
+
+CI integration artifact policy:
+- Default policy is `skip_if_missing` (integration tests skip if artifacts are unavailable).
+- To enforce artifacts and fail instead of skip, set:
+
+```bash
+export INTEGRATION_ARTIFACT_POLICY=require
+```
+
+Registry-driven smoke evaluation:
+
+```bash
+python scripts/smoke_eval_registry.py
+python scripts/smoke_eval_registry.py --with-data --require-artifacts
+```
+
+To populate checksum values in registries from local artifacts:
+
+```bash
+python scripts/update_registry_checksums.py
+```
+
+## Docker
+
+From `docker/`:
+
+```bash
 make build
 make run
 ```
 
-### Local Virtual Environment
+See [`docker/README.md`](docker/README.md) for Docker Hub and Apptainer/HPC usage.
 
-```
-python3 -m venv ~/python
-source ~/python/bin/activate
-pip install -e .
-```
+## Notes
 
-### HPC / Apptainer
+- Large datasets and model artifacts are expected; this repository is data-heavy.
+- Working notebooks can produce uncommitted changes during experimentation.
+- Release/tag process is documented in `RELEASE.md`.
 
-```
-module load apptainer
-make asif
-apptainer run --nv ml-wireless-signal-classification-hpc.sif jupyter lab --no-browser
-```
+## Citation
 
----
-
-# Citation
-
-Ramey, J. M., and Goda, P. (2025). Wireless Signal Classification via Deep Learning.  
-https://github.com/rameyjm7/ML-wireless-signal-classification
+Ramey, J. M., and Goda, P. (2025). Wireless Signal Classification via Deep Learning.
+GitHub: https://github.com/rameyjm7/ML-wireless-signal-classification

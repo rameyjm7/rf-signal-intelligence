@@ -1,0 +1,40 @@
+version: 1
+datasets:
+  - id: rml2016
+    name: RML2016.10a
+    task: modulation_classification
+    format: pickle
+    path: data/RML2016/RML2016.10a_dict.pkl
+    sample_shape: [128, 2]
+    snr_handling: append_snr_as_feature_channel
+    notes: Dictionary keyed by (modulation, snr).
+    checksum:
+      algorithm: sha256
+      value: null
+
+  - id: rml2018
+    name: RML2018.01A
+    task: modulation_classification
+    format: hdf5
+    path: data/RML2018/GOLD_XYZ_OSC.0001_1024.hdf5
+    sample_shape: [1024, 2]
+    snr_path: data/RML2018/GOLD_XYZ_OSC.0001_1024.hdf5::Z
+    labels_path: data/RML2018/classes-fixed.txt
+    snr_handling: append_snr_as_feature_channel
+    checksum:
+      algorithm: sha256
+      value: null
+
+  - id: deepradar2022
+    name: DeepRadar2022
+    task: radar_waveform_classification
+    format: mat_hdf5
+    paths:
+      x_test: data/DeepRadar2022/X_test.mat
+      y_test: data/DeepRadar2022/Y_test.mat
+      lbl_test: data/DeepRadar2022/lbl_test.mat
+    sample_shape: [1024, 2]
+    derived_feature: iq_envelope_as_third_channel
+    checksum:
+      algorithm: sha256
+      value: null

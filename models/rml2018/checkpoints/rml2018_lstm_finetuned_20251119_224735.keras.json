@@ -1,0 +1,8 @@
+{
+    "timestamp": "20251119_224735",
+    "checkpoint": "rml2018_lstm_finetuned_20251119_224735.keras",
+    "val_accuracy": 0.5368750095367432,
+    "train_accuracy": 0.5190104246139526,
+    "val_loss": 1.4135313034057617,
+    "train_loss": 1.4660855531692505
+}
