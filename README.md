@@ -39,7 +39,7 @@ Implemented workflows include:
 src/ml_wireless_classification/   Python package
   core/                           Maintained runtime/training components
   models/                         Maintained model definitions
-  legacy/                         Experimental utilities retained for archive notebooks
+  legacy/                         Experimental utilities kept for archive notebooks
   base/                           Backward-compatible import wrappers
 data/                             Datasets (RML2016, RML2018, DeepRadar2022)
 models/                           Saved model artifacts

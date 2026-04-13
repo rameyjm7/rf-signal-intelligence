@@ -51,3 +51,10 @@ This repository contains large datasets and model artifacts.
 - Prioritize reliability and reproducibility.
 - Avoid unrelated refactors in the same change.
 - Update documentation whenever CLI behavior, setup, or runtime paths change.
+
+## Source Layout
+
+- Put maintained runtime code in `src/ml_wireless_classification/core/`.
+- Put maintained model definitions in `src/ml_wireless_classification/models/`.
+- Keep older experimental helpers in `src/ml_wireless_classification/legacy/`.
+- Do not add new logic to `src/ml_wireless_classification/base/`; it exists for backward-compatible wrappers.
