@@ -5,7 +5,8 @@
 ![CUDA](https://img.shields.io/badge/CUDA-11.8-green)
 ![Docker](https://img.shields.io/badge/Docker-GPU--Ready-blue)
 
-**Authors:** Jacob M. Ramey, Paras Goda
+**Maintainer:** Jacob M. Ramey  
+LinkedIn: https://www.linkedin.com/in/rameyjm/
 
 Deep-learning workflows for wireless modulation classification, centered on RNN-LSTM models and related experiments.
 
@@ -172,6 +173,11 @@ Notes:
 |---|---:|---:|---:|---:|
 | All SNR levels | 0.8433 | 0.84 | 0.84 | 156,400 |
 
+## Results: Cross-Dataset Ensemble
+
+### Placeholder
+- Ensemble model result table/figure will be added after final baseline run from `43_evaluation_cross_dataset_ensemble.ipynb`.
+
 ## Requirements
 
 - Python 3.10+
@@ -301,4 +307,5 @@ See [`docker/README.md`](docker/README.md) for Docker Hub and Apptainer/HPC usag
 ## Citation
 
 Ramey, J. M., and Goda, P. (2025). Wireless Signal Classification via Deep Learning.
+Maintained by Jacob M. Ramey.
 GitHub: https://github.com/rameyjm7/ML-wireless-signal-classification
