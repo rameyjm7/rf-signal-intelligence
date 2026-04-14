@@ -175,8 +175,7 @@ Notes:
 
 ## Results: Cross-Dataset Ensemble
 
-### Placeholder
-- Ensemble model result table/figure will be added after final baseline run from `43_evaluation_cross_dataset_ensemble.ipynb`.
+<img width="2184" height="1990" alt="image" src="https://github.com/user-attachments/assets/371e4354-fa85-4b50-9143-50fbcbdb7927" />
 
 ## Requirements
 
