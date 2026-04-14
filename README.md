@@ -5,12 +5,14 @@
 ![CUDA](https://img.shields.io/badge/CUDA-11.8-green)
 ![Docker](https://img.shields.io/badge/Docker-GPU--Ready-blue)
 
-**Authors:** Jacob M. Ramey, Paras Goda
+**Maintainer:** Jacob M. Ramey  
+LinkedIn: https://www.linkedin.com/in/rameyjm/
 
 Deep-learning workflows for wireless modulation classification, centered on RNN-LSTM models and related experiments.
 
 ## Table of Contents
 - [Overview](#overview)
+- [Current Progress (April 2026)](#current-progress-april-2026)
 - [Repository Layout](#repository-layout)
 - [Datasets](#datasets)
 - [Results: RML2016](#results-rml2016)
@@ -32,6 +34,25 @@ Implemented workflows include:
 - CNN + recurrent hybrids for time-frequency structure
 - Cross-dataset experimentation on RML2016, RML2018, and DeepRadar2022
 - GPU-ready execution via Docker/Apptainer
+
+## Current Progress (April 2026)
+
+- RML2018 was rebaselined with a new continuation training run; best checkpoint evaluation reached `0.8295` accuracy on the current filtered protocol used in notebook evaluation.
+- Cross-dataset ensemble evaluation (`43`) is now aligned with pinned best-checkpoint loading and class-order calibration, producing stable combined results (recent run: `0.96` overall on the sampled combined set).
+- Notebook naming and pipeline flow were standardized:
+  - training: `30_lstm_rml2016.ipynb`, `31_lstm_rml2018.ipynb`, `32_lstm_deepradar2022.ipynb`
+  - evaluation: `40_evaluation_rml2016.ipynb`, `41_evaluation_rml2018.ipynb`, `42_evaluation_deepradar2022.ipynb`, `43_evaluation_cross_dataset_ensemble.ipynb`, `50_evaluation_comparison.ipynb`
+- Evaluation notebooks now save local artifacts under `outputs/` (confusion matrices, classification reports, SNR charts, and training-curve plots) so notebook outputs can be cleared while retaining reproducible figures/tables.
+- Artifact review notebook added: `notebooks/99_outputs_artifact_review.ipynb` for consolidating saved outputs before README/report updates.
+
+### Latest Notebook 50 Run (Local)
+
+| Dataset | Eval protocol | Accuracy | Macro F1 | Weighted F1 | Samples |
+|---|---|---:|---:|---:|---:|
+| DeepRadar2022 | All SNR levels | 0.8433 | 0.84 | 0.84 | 156,400 |
+| RML2016 | All SNR levels | 0.67 | 0.69 | 0.69 | 44,000 |
+| RML2016 | SNR > 5 dB | 0.93 | 0.92 | 0.92 | 15,332 |
+| RML2018 | Highest-SNR class-balanced slice (mapping-calibrated) | 0.9465 | 0.94 | 0.94 | 4,800 |
 
 ## Repository Layout
 
@@ -66,10 +87,17 @@ Radar waveform dataset used for CNN-BiLSTM style modeling and transfer evaluatio
 ## Results: RML2016
 
 ### Summary
-- Accuracy (all SNR): 67.8%
+- Accuracy (all SNR): 67.0%
 - Accuracy (SNR > 5 dB): 94%
 - Macro F1: 0.68
 - Weighted F1: 0.68
+
+### Current Local Snapshot (Notebook 50)
+
+| Split | Accuracy | Macro F1 | Weighted F1 | Samples |
+|---|---:|---:|---:|---:|
+| All SNR levels | 0.67 | 0.69 | 0.69 | 44,000 |
+| SNR > 5 dB | 0.93 | 0.92 | 0.92 | 15,332 |
 
 ### Confusion Matrix
 ![RML2016 Confusion Matrix](https://github.com/user-attachments/assets/6eebbb20-105d-4c9c-ba17-7f2ec11e070f)
@@ -77,7 +105,7 @@ Radar waveform dataset used for CNN-BiLSTM style modeling and transfer evaluatio
 ## Results: RML2018
 
 ### Overall Accuracy
-Approx. 72% across 72,000 evaluation samples.
+Legacy baseline (full-distribution run): approx. 72% across 72,000 evaluation samples.
 
 ### Results Figure 1
 ![RML2018 Image 1](https://github.com/user-attachments/assets/e23bbd81-9f4f-4d7a-9bd4-11e0a3625044)
@@ -120,6 +148,16 @@ accuracy 0.72 72000
 ![RML2018 Image 2](https://github.com/user-attachments/assets/99d3b667-93d4-430e-abf3-aa6b4c743a31)
 ![RML2018 Image 3](https://github.com/user-attachments/assets/5e8d2c18-5c62-489e-84ea-8b2648eca610)
 
+### Current Local Snapshot (Notebook 50)
+
+| Eval Protocol | Accuracy | Macro F1 | Weighted F1 | Samples |
+|---|---:|---:|---:|---:|
+| Highest-SNR class-balanced slice with class-order calibration | 0.9465 | 0.94 | 0.94 | 4,800 |
+
+Notes:
+- Mapping calibration in notebook `50` selected `LabelEncoder` order (`acc_orig=0.0192`, `acc_fixed=0.0994`, `acc_le=0.9465`).
+- This snapshot is not directly comparable to full-distribution all-SNR evaluations.
+
 ## Results: DeepRadar2022
 
 ### CNN-BiLSTM Hybrid Evaluation
@@ -128,6 +166,16 @@ accuracy 0.72 72000
 ![DeepRadar Image 2](https://github.com/user-attachments/assets/68843377-7fc4-45ba-9f16-9a40b9ecc2c9)
 ![DeepRadar Image 3](https://github.com/user-attachments/assets/0754f4da-e8d6-4cd0-9627-056e932a2865)
 ![DeepRadar Image 4](https://github.com/user-attachments/assets/c9eb6c5b-737f-4273-ba68-0ac3d13e3aab)
+
+### Current Local Snapshot (Notebook 50)
+
+| Split | Accuracy | Macro F1 | Weighted F1 | Samples |
+|---|---:|---:|---:|---:|
+| All SNR levels | 0.8433 | 0.84 | 0.84 | 156,400 |
+
+## Results: Cross-Dataset Ensemble
+
+<img width="2184" height="1990" alt="image" src="https://github.com/user-attachments/assets/371e4354-fa85-4b50-9143-50fbcbdb7927" />
 
 ## Requirements
 
@@ -258,4 +306,5 @@ See [`docker/README.md`](docker/README.md) for Docker Hub and Apptainer/HPC usag
 ## Citation
 
 Ramey, J. M., and Goda, P. (2025). Wireless Signal Classification via Deep Learning.
+Maintained by Jacob M. Ramey.
 GitHub: https://github.com/rameyjm7/ML-wireless-signal-classification
