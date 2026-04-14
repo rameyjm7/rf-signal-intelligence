@@ -1,0 +1,54 @@
+version: 1
+additional_datasets:
+  - id: multi_rat_lte_nr_wifi
+    name: Multi-RAT LTE/5G NR/Wi-Fi SDR Dataset
+    priority: 1
+    method: zenodo_record
+    record_id: 10811147
+    target_subdir: MultiRAT_LTE_NR_WiFi
+    protocol_tags: [lte, 5g_nr, wifi]
+    access: public
+
+  - id: torchsig_sig53
+    name: TorchSig Sig53 (generated synthetic benchmark)
+    priority: 2
+    method: torchsig_generate
+    target_subdir: TorchSig_Sig53
+    protocol_tags: [synthetic, modulation, benchmark]
+    access: public
+
+  - id: wisig_wifi
+    name: WiSig Wi-Fi Dataset
+    priority: 3
+    method: manual_registration
+    landing_url: https://cores.ee.ucla.edu/downloads/datasets/wisig/
+    target_subdir: WiSig
+    protocol_tags: [wifi, real_capture]
+    access: registration_required
+
+  - id: deepsig_radioml
+    name: DeepSig RadioML Datasets
+    priority: 4
+    method: manual_registration
+    landing_url: https://www.deepsig.ai/datasets/
+    target_subdir: DeepSig_RadioML
+    protocol_tags: [modulation, baseline]
+    access: registration_required
+
+  - id: mendeley_realworld_amr
+    name: Real-World AMR IQ Dataset (Mendeley)
+    priority: 5
+    method: mendeley_landing
+    landing_url: https://data.mendeley.com/datasets/tjzsbph49x/2
+    target_subdir: Mendeley_AMR_IQ
+    protocol_tags: [real_capture, modulation]
+    access: public
+
+  - id: oracle_rf
+    name: ORACLE RF Fingerprinting Dataset
+    priority: 6
+    method: manual_registration
+    landing_url: https://genesys-lab.org/oracle
+    target_subdir: ORACLE_RF
+    protocol_tags: [rf_fingerprinting, device_id]
+    access: registration_required

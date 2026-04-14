@@ -9,9 +9,10 @@ Notebook execution order and naming convention:
 Current notebooks:
 
 - `10_download_data.ipynb`
+- `11_download_additional_datasets.ipynb`
 - `20_signal_eda.ipynb`
 - `30_lstm_rml2016.ipynb`
-- `31_rml2018_lstm_rnn.ipynb`
+- `31_lstm_rml2018.ipynb`
 - `32_lstm_deepradar2022.ipynb`
 - `40_evaluation_rml2016.ipynb`
 - `41_evaluation_rml2018.ipynb`
@@ -19,7 +20,7 @@ Current notebooks:
 - `43_evaluation_cross_dataset_ensemble.ipynb`
 - `50_evaluation_comparison.ipynb`
 
-Notes for `31_rml2018_lstm_rnn.ipynb`:
+Notes for `31_lstm_rml2018.ipynb`:
 
 - Cell 1: base RML2018 training (auto-selects GPU-safe batch size).
 - Cell 2: short fine-tuning + checkpoint selection (auto-selects GPU-safe batch size).
