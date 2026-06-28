@@ -179,6 +179,32 @@ Notes:
 
 <img width="2184" height="1990" alt="image" src="https://github.com/user-attachments/assets/371e4354-fa85-4b50-9143-50fbcbdb7927" />
 
+## Results: Noisy Drone RF v2
+
+<img width="1093" height="989" alt="image" src="https://github.com/user-attachments/assets/b38df917-d669-472b-bdbb-6c0df3673898" />
+
+<img width="989" height="590" alt="image" src="https://github.com/user-attachments/assets/ce206ad4-3df6-4a9c-8665-674df6181c6f" />
+
+VGG full-complex spectrogram balanced report (1 eval windows)
+accuracy: 0.9802955665024631
+              precision    recall  f1-score   support
+
+         DJI       1.00      0.93      0.96        29
+   FutabaT14       1.00      0.97      0.98        29
+    FutabaT7       1.00      1.00      1.00        29
+    Graupner       1.00      1.00      1.00        29
+       Noise       0.88      1.00      0.94        29
+     Taranis       1.00      0.97      0.98        29
+     Turnigy       1.00      1.00      1.00        29
+
+    accuracy                           0.98       203
+   macro avg       0.98      0.98      0.98       203
+weighted avg       0.98      0.98      0.98       203
+
+Saved: /home/rameyjm7/workspace/ML-wireless-signal-classification/outputs/noisy_drone_rf_v2_eval/33_noisy_drone_rf_v2_vgg_full_complex_spectrogram_balanced_confusion_matrix.png
+
+
+
 ## Requirements
 
 - Python 3.10+
