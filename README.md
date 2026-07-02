@@ -14,12 +14,13 @@ The current work centers on wireless signal classification, with room to grow in
 
 ## Table of Contents
 - [Overview](#overview)
-- [Current Progress (April 2026)](#current-progress-april-2026)
+- [Current Progress (July 2026)](#current-progress-july-2026)
 - [Repository Layout](#repository-layout)
 - [Datasets](#datasets)
 - [Results: RML2016](#results-rml2016)
 - [Results: RML2018](#results-rml2018)
 - [Results: DeepRadar2022](#results-deepradar2022)
+- [Results: Noisy Drone RF v2](#results-noisy-drone-rf-v2)
 - [Requirements](#requirements)
 - [Local Setup](#local-setup)
 - [CLI Usage](#cli-usage)
@@ -37,7 +38,7 @@ Implemented workflows include:
 - Cross-dataset experimentation on RML2016, RML2018, and DeepRadar2022
 - GPU-ready execution via Docker/Apptainer
 
-## Current Progress (April 2026)
+## Current Progress (July 2026)
 
 - RML2018 was rebaselined with a new continuation training run; best checkpoint evaluation reached `0.8295` accuracy on the current filtered protocol used in notebook evaluation.
 - Cross-dataset ensemble evaluation (`43`) is now aligned with pinned best-checkpoint loading and class-order calibration, producing stable combined results (recent run: `0.96` overall on the sampled combined set).
@@ -49,12 +50,16 @@ Implemented workflows include:
 
 ### Latest Notebook 50 Run (Local)
 
-| Dataset | Eval protocol | Accuracy | Macro F1 | Weighted F1 | Samples |
-|---|---|---:|---:|---:|---:|
-| DeepRadar2022 | All SNR levels | 0.8433 | 0.84 | 0.84 | 156,400 |
-| RML2016 | All SNR levels | 0.67 | 0.69 | 0.69 | 44,000 |
-| RML2016 | SNR > 5 dB | 0.93 | 0.92 | 0.92 | 15,332 |
-| RML2018 | Highest-SNR class-balanced slice (mapping-calibrated) | 0.9465 | 0.94 | 0.94 | 4,800 |
+| Dataset | Model | Eval protocol | Accuracy | Macro F1 | Weighted F1 | Samples |
+|---|---|---|---:|---:|---:|---:|
+| Noisy Drone RF v2 | VGG full-complex spectrogram | Natural held-out test | 0.9769 | 0.9775 | 0.9767 | 649 |
+| Noisy Drone RF v2 | VGG full-complex spectrogram | Balanced held-out test | 0.9803 | 0.9807 | 0.9807 | 203 |
+| RML2016 | CNN-transformer | All SNR levels | 0.6645 | 0.6592 | 0.6592 | 44,000 |
+| RML2016 | CNN-transformer | SNR > -2 dB | 0.8969 | 0.8900 | 0.8913 | n/a |
+| RML2018 | LSTM continued checkpoint | All test | 0.8295 | n/a | n/a | n/a |
+| DeepRadar2022 | CNN-transformer continued stage 2 | All test | 0.4461 | 0.3973 | 0.3973 | n/a |
+
+Notebook `50` now evaluates Noisy Drone RF v2 in a dedicated eval-only cell and writes consolidated comparison artifacts under `outputs/50_evaluation_comparison/`.
 
 ## Repository Layout
 
@@ -181,11 +186,39 @@ Notes:
 
 ## Results: Noisy Drone RF v2
 
+The current canonical Noisy Drone RF v2 model is the VGG full-complex spectrogram model saved at:
+
+`models/noisy_drone_rf_v2/noisy_drone_rf_v2_vgg_full_complex_spectrogram_best.keras`
+
+Notebook flow:
+- `33_vgg_spectrogram_noisy_drone_rf_v2.ipynb`: training/evaluation experiment and baseline saved artifacts.
+- `44_evaluation_noisy_drone_rf_v2.ipynb`: eval-only notebook for the canonical VGG model.
+- `50_evaluation_comparison.ipynb`: final comparison, with a dedicated Noisy Drone RF v2 eval-only cell.
+
+Current metrics from notebooks `33`, `44`, and `50` agree on the same held-out split configuration (`NOISY_DRONE_MIN_SNR_DB=-6`, `NOISY_DRONE_DATA_FRACTION=0.25`, one eval window).
+
+| Source | Eval protocol | Accuracy | Macro F1 | Weighted F1 | Samples |
+|---|---|---:|---:|---:|---:|
+| `33` | Balanced held-out test | 0.9803 | 0.9807 | 0.9807 | 203 |
+| `44` | Natural held-out test | 0.9769 | 0.9775 | 0.9767 | 649 |
+| `44` | Balanced held-out test | 0.9803 | 0.9807 | 0.9807 | 203 |
+| `50` | Natural held-out test | 0.9769 | 0.9775 | 0.9767 | 649 |
+| `50` | Balanced held-out test | 0.9803 | 0.9807 | 0.9807 | 203 |
+
+Saved result artifacts:
+- [33 balanced confusion matrix](outputs/noisy_drone_rf_v2_eval/33_noisy_drone_rf_v2_vgg_full_complex_spectrogram_balanced_confusion_matrix.png)
+- [44 balanced confusion matrix](outputs/noisy_drone_rf_v2_eval/44_noisy_drone_rf_v2_vgg_full_complex_spectrogram_balanced_confusion_matrix.png)
+- [44 accuracy vs. SNR](outputs/noisy_drone_rf_v2_eval/44_noisy_drone_rf_v2_vgg_full_complex_accuracy_vs_snr.png)
+- [44 per-class accuracy vs. SNR](outputs/noisy_drone_rf_v2_eval/44_noisy_drone_rf_v2_vgg_full_complex_accuracy_vs_snr_per_class.png)
+- [50 cross-dataset comparison](outputs/50_evaluation_comparison/50_cross_dataset_model_comparison.csv)
+
+Existing result snapshots are retained below for continuity.
+
 <img width="1093" height="989" alt="image" src="https://github.com/user-attachments/assets/b38df917-d669-472b-bdbb-6c0df3673898" />
 
 <img width="989" height="590" alt="image" src="https://github.com/user-attachments/assets/ce206ad4-3df6-4a9c-8665-674df6181c6f" />
 
-## VGG Full-Complex Spectrogram Balanced Report
+### VGG Full-Complex Spectrogram Balanced Report
 
 **Accuracy:** 0.9803
 

@@ -1,0 +1,26 @@
+{
+  "model": "noisy_drone_rf_v2_vgg_full_complex_spectrogram",
+  "model_path": "/home/rameyjm7/workspace/ML-wireless-signal-classification/models/noisy_drone_rf_v2/noisy_drone_rf_v2_vgg_full_complex_spectrogram_best.keras",
+  "eval_windows": 1,
+  "sample_len": 1048576,
+  "min_snr_db": -6.0,
+  "data_fraction": 0.25,
+  "num_classes": 7,
+  "test_samples": 649,
+  "label_names": [
+    "DJI",
+    "FutabaT14",
+    "FutabaT7",
+    "Graupner",
+    "Noise",
+    "Taranis",
+    "Turnigy"
+  ],
+  "accuracy": 0.9768875192604006,
+  "macro_f1": 0.9775421758630028,
+  "weighted_f1": 0.9766794151024154,
+  "balanced_accuracy": 0.9802955665024631,
+  "balanced_macro_f1": 0.9806688379936015,
+  "balanced_weighted_f1": 0.9806688379936014,
+  "balanced_test_samples": 203
+}
