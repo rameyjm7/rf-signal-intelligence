@@ -19,6 +19,8 @@ models/
       best_checkpoint.txt
   deepradar2022/
     deepradar2022_cnn_bilstm_final.keras
+  noisy_drone_rf_v2/
+    noisy_drone_rf_v2_cnn_bilstm_final.keras
 ```
 
 ## Models
@@ -31,6 +33,7 @@ models/
 | `models/rml2018/rml2018_lstm_rnn.keras` | RML2018.01A | LSTM-RNN | Primary RML2018 model. |
 | `models/rml2018/rml2018_lstm_balanced.keras` | RML2018.01A | LSTM-RNN | Class-balancing variant. |
 | `models/deepradar2022/deepradar2022_cnn_bilstm_final.keras` | DeepRadar2022 | CNN + BiLSTM | Final radar waveform model. |
+| `models/noisy_drone_rf_v2/noisy_drone_rf_v2_cnn_bilstm_final.keras` | Noisy Drone RF v2 | CNN + BiLSTM | Local final model expected by notebooks `33` and `44`; not currently committed on this branch. |
 
 ## Usage
 
