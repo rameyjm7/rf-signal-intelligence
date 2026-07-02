@@ -185,23 +185,22 @@ Notes:
 
 <img width="989" height="590" alt="image" src="https://github.com/user-attachments/assets/ce206ad4-3df6-4a9c-8665-674df6181c6f" />
 
-VGG full-complex spectrogram balanced report (1 eval windows)
-accuracy: 0.9802955665024631
-              precision    recall  f1-score   support
+## VGG Full-Complex Spectrogram Balanced Report
 
-         DJI       1.00      0.93      0.96        29
-   FutabaT14       1.00      0.97      0.98        29
-    FutabaT7       1.00      1.00      1.00        29
-    Graupner       1.00      1.00      1.00        29
-       Noise       0.88      1.00      0.94        29
-     Taranis       1.00      0.97      0.98        29
-     Turnigy       1.00      1.00      1.00        29
+**Accuracy:** 0.9803
 
-    accuracy                           0.98       203
-   macro avg       0.98      0.98      0.98       203
-weighted avg       0.98      0.98      0.98       203
-
-Saved: /home/rameyjm7/workspace/ML-wireless-signal-classification/outputs/noisy_drone_rf_v2_eval/33_noisy_drone_rf_v2_vgg_full_complex_spectrogram_balanced_confusion_matrix.png
+| Class | Precision | Recall | F1-score | Support |
+|---|---:|---:|---:|---:|
+| DJI | 1.00 | 0.93 | 0.96 | 29 |
+| FutabaT14 | 1.00 | 0.97 | 0.98 | 29 |
+| FutabaT7 | 1.00 | 1.00 | 1.00 | 29 |
+| Graupner | 1.00 | 1.00 | 1.00 | 29 |
+| Noise | 0.88 | 1.00 | 0.94 | 29 |
+| Taranis | 1.00 | 0.97 | 0.98 | 29 |
+| Turnigy | 1.00 | 1.00 | 1.00 | 29 |
+| **Accuracy** |  |  | **0.98** | **203** |
+| **Macro avg** | **0.98** | **0.98** | **0.98** | **203** |
+| **Weighted avg** | **0.98** | **0.98** | **0.98** | **203** |
 
 
 
