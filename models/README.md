@@ -19,6 +19,9 @@ models/
       best_checkpoint.txt
   deepradar2022/
     deepradar2022_cnn_bilstm_final.keras
+  noisy_drone_rf_v2/
+    noisy_drone_rf_v2_vgg_full_complex_spectrogram_best.keras
+    noisy_drone_rf_v2_vgg_full_complex_spectrogram_final.keras
 ```
 
 ## Models
@@ -31,6 +34,8 @@ models/
 | `models/rml2018/rml2018_lstm_rnn.keras` | RML2018.01A | LSTM-RNN | Primary RML2018 model. |
 | `models/rml2018/rml2018_lstm_balanced.keras` | RML2018.01A | LSTM-RNN | Class-balancing variant. |
 | `models/deepradar2022/deepradar2022_cnn_bilstm_final.keras` | DeepRadar2022 | CNN + BiLSTM | Final radar waveform model. |
+| `models/noisy_drone_rf_v2/noisy_drone_rf_v2_vgg_full_complex_spectrogram_best.keras` | Noisy Drone RF v2 | VGG full-complex spectrogram | Canonical Noisy Drone RF v2 model used by notebooks `33`, `44`, and `50`; large model artifact is expected locally and is not currently committed on this branch. |
+| `models/noisy_drone_rf_v2/noisy_drone_rf_v2_vgg_full_complex_spectrogram_final.keras` | Noisy Drone RF v2 | VGG full-complex spectrogram | Latest continuation checkpoint from notebook `33`; use the best checkpoint above for canonical reported metrics. |
 
 ## Usage
 
