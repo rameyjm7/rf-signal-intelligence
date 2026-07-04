@@ -206,6 +206,7 @@ Current metrics from notebooks `33`, `44`, and `50` agree on the same held-out s
 | `50` | Balanced held-out test | 0.9803 | 0.9807 | 0.9807 | 203 |
 
 Saved result artifacts:
+- [Live OTA SDR-to-SDR class sweep report](results/noisy_drone_rf_v2/class_sweep_results.md)
 - [33 balanced confusion matrix](outputs/noisy_drone_rf_v2_eval/33_noisy_drone_rf_v2_vgg_full_complex_spectrogram_balanced_confusion_matrix.png)
 - [44 balanced confusion matrix](outputs/noisy_drone_rf_v2_eval/44_noisy_drone_rf_v2_vgg_full_complex_spectrogram_balanced_confusion_matrix.png)
 - [44 accuracy vs. SNR](outputs/noisy_drone_rf_v2_eval/44_noisy_drone_rf_v2_vgg_full_complex_accuracy_vs_snr.png)
