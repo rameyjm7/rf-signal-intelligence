@@ -21,6 +21,7 @@ import pickle
 import random
 import re
 import shlex
+import signal
 import subprocess
 import sys
 import threading
@@ -994,6 +995,8 @@ def parse_args() -> argparse.Namespace:
         help="Directory for per-trial waterfall PNG snapshots.",
     )
     parser.add_argument("--tx-test-seed-start", type=int, default=1000, help="Base TX seed for repeatable class sweep sample choices.")
+    parser.add_argument("--tx-test-delay-sec", type=float, default=2.0, help="Delay between class sweep child trials so SDR USB devices can settle.")
+    parser.add_argument("--tx-test-retries", type=int, default=2, help="Retry a failed class sweep child trial this many times.")
     parser.add_argument("--stop-on-test-error", action="store_true", help="Stop the class sweep after the first failed child trial.")
     return parser.parse_args()
 
@@ -1503,24 +1506,58 @@ def run_tx_class_sweep(args: argparse.Namespace) -> int:
             add_cli_arg(cmd, "--tx-delay-sec", args.tx_delay_sec)
             add_cli_arg(cmd, "--tx-capture-mode", args.tx_capture_mode)
             add_cli_arg(cmd, "--rx-flush-chunks", args.rx_flush_chunks)
+            add_cli_arg(cmd, "--tx-test-delay-sec", 0.0)
+            add_cli_arg(cmd, "--tx-test-retries", 0)
             if args.rx_agc:
                 cmd.append("--rx-agc")
             if not args.scan_windows:
                 cmd.append("--no-scan-windows")
 
-            child = subprocess.Popen(
-                cmd,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.STDOUT,
-                text=True,
-                bufsize=1,
-            )
-            assert child.stdout is not None
+            returncode = 1
             lines = []
-            for line in child.stdout:
-                print(line, end="", flush=True)
-                lines.append(line.rstrip("\n"))
-            returncode = child.wait()
+            for attempt in range(max(0, args.tx_test_retries) + 1):
+                if args.tx_test_delay_sec > 0 and (trial_number > 1 or attempt > 0):
+                    reason = "retry" if attempt > 0 else "next trial"
+                    print(f"Waiting {args.tx_test_delay_sec:.1f}s before {reason}...", flush=True)
+                    time.sleep(args.tx_test_delay_sec)
+                if attempt > 0:
+                    print(
+                        f"Retrying class sweep trial {trial_number}/{total}: "
+                        f"target={class_name} attempt={attempt + 1}",
+                        flush=True,
+                    )
+                child = subprocess.Popen(
+                    cmd,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.STDOUT,
+                    text=True,
+                    bufsize=1,
+                    start_new_session=True,
+                )
+                assert child.stdout is not None
+                lines = []
+                try:
+                    for line in child.stdout:
+                        print(line, end="", flush=True)
+                        lines.append(line.rstrip("\n"))
+                    returncode = child.wait()
+                except KeyboardInterrupt:
+                    if child.poll() is None:
+                        os.killpg(child.pid, signal.SIGTERM)
+                        try:
+                            child.wait(timeout=5.0)
+                        except subprocess.TimeoutExpired:
+                            os.killpg(child.pid, signal.SIGKILL)
+                            child.wait()
+                    raise
+                if returncode == 0:
+                    break
+                if attempt < max(0, args.tx_test_retries):
+                    print(
+                        f"Trial {trial_number} exited with code {returncode}; "
+                        f"will retry after SDR settle delay.",
+                        flush=True,
+                    )
 
             row = parse_child_trial_log(lines)
             row["trial"] = str(trial_number)

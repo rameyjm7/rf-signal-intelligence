@@ -14,6 +14,74 @@ This test replays labeled NoisyDroneRF IQ samples over the air from one SDR and 
 - RX IQ windows: `../../outputs/class_sweep_iq`
 - Waterfall snapshots: `waterfalls/`
 
+## Next Validation Matrix
+
+The current result is a controlled hardware-in-the-loop baseline: 18 live OTA replay trials, three per transmitter class, using high-SNR dataset samples and excluding the Noise class. To strengthen the feasibility evidence without collecting live drone emissions, the next validation pass should expand this into a small controlled stress matrix.
+
+Recommended additions:
+
+- Increase to `10` trials per class.
+- Include the `Noise` class.
+- Repeat the class sweep at dataset SNR floors of `20`, `10`, and `0` dB.
+- Repeat one lower-power RF setting to test link-margin sensitivity.
+
+This would produce four OTA sweep reports:
+
+| Run | Purpose | Trials | Key settings |
+|---|---|---:|---|
+| Baseline high-SNR replay | Repeat current condition with more trials and Noise included | 70 | `--tx-test-count 10 --tx-min-snr 20` |
+| Medium-SNR replay | Check degradation against less ideal dataset samples | 70 | `--tx-test-count 10 --tx-min-snr 10` |
+| Low-SNR replay | Stress the model with lower-SNR replay samples | 70 | `--tx-test-count 10 --tx-min-snr 0` |
+| Lower-power RF link | Check sensitivity to reduced received signal strength | 70 | `--tx-test-count 10 --tx-min-snr 20 --tx-amplitude 0.10 --rx-gain 55` |
+
+Suggested commands:
+
+```bash
+/home/jake/workspace/SDR/RF_Sentinel/.venv/bin/python3 scripts/live_noisy_drone_rf_classifier.py \
+  --tx-test-all-classes \
+  --tx-test-classes DJI,FutabaT14,FutabaT7,Graupner,Noise,Taranis,Turnigy \
+  --tx-test-count 10 \
+  --tx-min-snr 20 \
+  --tx-test-output-csv outputs/noisy_drone_rf_v2_snr20_class_sweep.csv \
+  --tx-test-output-md results/noisy_drone_rf_v2/snr20_class_sweep_results.md \
+  --tx-test-save-rx-dir outputs/noisy_drone_rf_v2_snr20_iq \
+  --tx-test-save-plots-dir results/noisy_drone_rf_v2/snr20_waterfalls
+
+/home/jake/workspace/SDR/RF_Sentinel/.venv/bin/python3 scripts/live_noisy_drone_rf_classifier.py \
+  --tx-test-all-classes \
+  --tx-test-classes DJI,FutabaT14,FutabaT7,Graupner,Noise,Taranis,Turnigy \
+  --tx-test-count 10 \
+  --tx-min-snr 10 \
+  --tx-test-output-csv outputs/noisy_drone_rf_v2_snr10_class_sweep.csv \
+  --tx-test-output-md results/noisy_drone_rf_v2/snr10_class_sweep_results.md \
+  --tx-test-save-rx-dir outputs/noisy_drone_rf_v2_snr10_iq \
+  --tx-test-save-plots-dir results/noisy_drone_rf_v2/snr10_waterfalls
+
+/home/jake/workspace/SDR/RF_Sentinel/.venv/bin/python3 scripts/live_noisy_drone_rf_classifier.py \
+  --tx-test-all-classes \
+  --tx-test-classes DJI,FutabaT14,FutabaT7,Graupner,Noise,Taranis,Turnigy \
+  --tx-test-count 10 \
+  --tx-min-snr 0 \
+  --tx-test-output-csv outputs/noisy_drone_rf_v2_snr0_class_sweep.csv \
+  --tx-test-output-md results/noisy_drone_rf_v2/snr0_class_sweep_results.md \
+  --tx-test-save-rx-dir outputs/noisy_drone_rf_v2_snr0_iq \
+  --tx-test-save-plots-dir results/noisy_drone_rf_v2/snr0_waterfalls
+
+/home/jake/workspace/SDR/RF_Sentinel/.venv/bin/python3 scripts/live_noisy_drone_rf_classifier.py \
+  --tx-test-all-classes \
+  --tx-test-classes DJI,FutabaT14,FutabaT7,Graupner,Noise,Taranis,Turnigy \
+  --tx-test-count 10 \
+  --tx-min-snr 20 \
+  --tx-amplitude 0.10 \
+  --rx-gain 55 \
+  --tx-test-output-csv outputs/noisy_drone_rf_v2_low_power_class_sweep.csv \
+  --tx-test-output-md results/noisy_drone_rf_v2/low_power_class_sweep_results.md \
+  --tx-test-save-rx-dir outputs/noisy_drone_rf_v2_low_power_iq \
+  --tx-test-save-plots-dir results/noisy_drone_rf_v2/low_power_waterfalls
+```
+
+The current baseline result should be interpreted as a successful initial OTA replay validation. The matrix above would strengthen it into a repeatable controlled SDR benchmark with basic variation across class, Noise rejection, dataset SNR, and RF link margin.
+
 ## OTA SDR Setup
 
 | Setting | Value |
