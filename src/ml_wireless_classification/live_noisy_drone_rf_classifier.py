@@ -14,7 +14,6 @@ from __future__ import annotations
 
 import argparse
 import csv
-from collections import deque
 import datetime as dt
 import os
 import pickle
@@ -27,13 +26,13 @@ import sys
 import threading
 import time
 import zipfile
+from collections import deque
 from pathlib import Path
 
 os.environ.setdefault("TF_CPP_MIN_LOG_LEVEL", "3")
 os.environ.setdefault("CUDA_VISIBLE_DEVICES", "-1")
 
 import numpy as np
-
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_MODEL_PATH = (
