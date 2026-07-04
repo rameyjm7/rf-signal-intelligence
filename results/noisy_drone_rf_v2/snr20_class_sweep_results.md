@@ -19,7 +19,7 @@ This test replays labeled NoisyDroneRF IQ samples over the air from one SDR and 
 | Setting | Value |
 |---|---:|
 | Model | `/home/jake/workspace/SDR/rf-signal-intelligence/models/noisy_drone_rf_v2/noisy_drone_rf_v2_vgg_full_complex_spectrogram_best.keras` |
-| TX SDR | `driver=bladerf,serial=7faa712b1fab42f4b84e494171b91721` |
+| TX SDR | `driver=bladerf` |
 | TX frontend | `bladeRF TX1` |
 | TX antenna | `TX` |
 | RX SDR | `driver=hackrf` |

@@ -87,7 +87,7 @@ The current baseline result should be interpreted as a successful initial OTA re
 | Setting | Value |
 |---|---:|
 | Model | `models/noisy_drone_rf_v2/noisy_drone_rf_v2_vgg_full_complex_spectrogram_best.keras` |
-| TX SDR | `driver=bladerf,serial=7faa712b1fab42f4b84e494171b91721` |
+| TX SDR | `driver=bladerf` |
 | TX frontend | `bladeRF TX1` |
 | TX antenna | `TX` |
 | RX SDR | `driver=hackrf` |

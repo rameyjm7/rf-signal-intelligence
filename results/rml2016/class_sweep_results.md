@@ -19,7 +19,7 @@ This test replays labeled RML2016.10a IQ samples over the air from one SDR and c
 | Setting | Value |
 |---|---:|
 | Model | `models/rml2016/rml2016_lstm_rnn_2024.keras` |
-| TX SDR | `driver=bladerf,serial=7faa712b1fab42f4b84e494171b91721` |
+| TX SDR | `driver=bladerf` |
 | TX frontend | `bladeRF TX1` |
 | TX antenna | `TX` |
 | RX SDR | `driver=hackrf` |
