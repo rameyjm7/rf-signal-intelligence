@@ -1,4 +1,4 @@
-# ML Wireless Signal Classification
+# RF Signal Intelligence
 
 ![Python](https://img.shields.io/badge/Python-3.10-blue)
 ![TensorFlow](https://img.shields.io/badge/TensorFlow-2.x-orange)
@@ -8,7 +8,9 @@
 **Maintainer:** Jacob M. Ramey  
 LinkedIn: https://www.linkedin.com/in/rameyjm/
 
-Deep-learning workflows for wireless modulation classification, centered on RNN-LSTM models and related experiments.
+GPU-ready RF/IQ machine-learning workspace for modulation recognition, radar waveform analysis, signal preprocessing, model evaluation, and reproducible dataset workflows.
+
+The current work centers on wireless signal classification, with room to grow into broader RFML tasks such as signal embeddings, anomaly detection, streaming inference, and SDR-backed dataset generation.
 
 ## Table of Contents
 - [Overview](#overview)
@@ -27,7 +29,7 @@ Deep-learning workflows for wireless modulation classification, centered on RNN-
 
 ## Overview
 
-This repository contains training pipelines, evaluation notebooks, saved models, and documentation for deep-learning-based wireless signal classification.
+This repository contains training pipelines, evaluation notebooks, saved models, and documentation for deep-learning-based RF signal intelligence.
 
 Implemented workflows include:
 - LSTM and BiLSTM architectures for raw I/Q modeling
@@ -307,4 +309,4 @@ See [`docker/README.md`](docker/README.md) for Docker Hub and Apptainer/HPC usag
 
 Ramey, J. M., and Goda, P. (2025). Wireless Signal Classification via Deep Learning.
 Maintained by Jacob M. Ramey.
-GitHub: https://github.com/rameyjm7/ML-wireless-signal-classification
+GitHub: https://github.com/rameyjm7/rf-signal-intelligence
