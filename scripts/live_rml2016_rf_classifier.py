@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
-"""Listen for RF energy and classify it with the Noisy Drone RF v2 model.
+"""Replay RML2016.10a IQ over SDR and classify the live received signal.
 
 Examples:
-  python scripts/live_noisy_drone_rf_classifier.py --freq 2.44e9 --sample-rate 20e6
-  python scripts/live_noisy_drone_rf_classifier.py --iq-file capture.npy --once
-  python scripts/live_noisy_drone_rf_classifier.py --tx --freq 2.44e9 --sample-rate 20e6 --once
+  python scripts/live_rml2016_rf_classifier.py --tx --tx-class-name QPSK --once
+  python scripts/live_rml2016_rf_classifier.py --tx-test-all-classes --tx-test-count 3
 
 Live SDR capture uses SoapySDR when available. File replay accepts .npy, .npz,
-.pt, and raw complex64 .bin/.c64 files.
+.pt, and raw complex64 .bin/.c64 files. RML2016 models in this repository use
+input windows shaped (128, 3): I, Q, and an SNR feature.
 """
 
 from __future__ import annotations
@@ -38,21 +38,21 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_MODEL_PATH = (
     PROJECT_ROOT
     / "models"
-    / "noisy_drone_rf_v2"
-    / "noisy_drone_rf_v2_vgg_full_complex_spectrogram_best.keras"
+    / "rml2016"
+    / "rml2016_lstm_rnn_2024.keras"
 )
-LABEL_NAMES = ["DJI", "FutabaT14", "FutabaT7", "Graupner", "Noise", "Taranis", "Turnigy"]
+LABEL_NAMES = ["8PSK", "AM-DSB", "AM-SSB", "BPSK", "CPFSK", "GFSK", "PAM4", "QAM16", "QAM64", "QPSK", "WBFM"]
 DEFAULT_RX_DEVICE_ARGS = "driver=hackrf"
 DEFAULT_TX_DEVICE_ARGS = "driver=bladerf,serial=7faa712b1fab42f4b84e494171b91721"
 DEFAULT_BLADERF_STREAM_ARGS = "buffers=16,buflen=65536,transfers=8"
 DEFAULT_FREQ = 2.399e9
 DEFAULT_SAMPLE_RATE = 20e6
 DEFAULT_BANDWIDTH = 20e6
-DEFAULT_TX_DATASET_DIR = Path("/data/rameyjm7/datasets/NoisyDroneRFv2")
-DEFAULT_TX_CLASS_NAME = "FutabaT14"
-DEFAULT_TX_MIN_SNR = 20
-NOISY_DRONE_SAMPLE_RE = re.compile(
-    r"IQdata_sample(?P<sample>\d+)_target(?P<target>-?\d+)_snr(?P<snr>-?\d+)\.pt$"
+DEFAULT_TX_DATASET_DIR = Path("/scratch/rameyjm7/datasets/RML2016/RML2016.10a_dict.pkl")
+DEFAULT_TX_CLASS_NAME = "QPSK"
+DEFAULT_TX_MIN_SNR = 18
+RML2016_SAMPLE_RE = re.compile(
+    r"RML2016_(?P<mod>.+)_snr(?P<snr>-?\d+)_sample(?P<sample>\d+)$"
 )
 
 
@@ -433,7 +433,7 @@ class TxWorker:
             return
         self.error = None
         self.stop_event.clear()
-        self.thread = threading.Thread(target=self._run, name="noisy-drone-tx", daemon=True)
+        self.thread = threading.Thread(target=self._run, name="rml2016-tx", daemon=True)
         self.thread.start()
 
     def _run(self) -> None:
@@ -542,27 +542,28 @@ def prepare_tx_iq(iq: np.ndarray, *, amplitude: float, pad_seconds: float, sampl
     return coerce_iq_array(complex_iq)
 
 
-def discover_noisy_drone_dataset(search_roots: list[Path]) -> Path | None:
-    preferred_names = ("noisy_drone_rx", "NoisyDroneRFv2", "noisy_drone_rf_v2")
+def discover_rml2016_dataset(search_roots: list[Path]) -> Path | None:
+    preferred_names = ("RML2016.10a_dict.pkl",)
     for root in search_roots:
         if not root.exists():
             continue
         for preferred in preferred_names:
             for path in root.rglob(preferred):
-                if path.is_dir() and any(path.rglob("IQdata_sample*_target*_snr*.pt")):
+                if path.is_file():
                     return path
-        for class_stats in root.rglob("class_stats.csv"):
-            parent = class_stats.parent
-            if any(parent.rglob("IQdata_sample*_target*_snr*.pt")):
-                return parent
     return None
 
 
-def noisy_drone_file_metadata(path: Path) -> tuple[int | None, int | None]:
-    match = NOISY_DRONE_SAMPLE_RE.search(path.name)
+def rml2016_sample_metadata(path: Path) -> tuple[str | None, int | None, int | None]:
+    match = RML2016_SAMPLE_RE.search(path.name)
     if not match:
-        return None, None
-    return int(match.group("target")), int(match.group("snr"))
+        return None, None, None
+    return match.group("mod"), int(match.group("snr")), int(match.group("sample"))
+
+
+def load_rml2016_pickle(path: Path) -> dict[tuple[str, int], np.ndarray]:
+    with path.open("rb") as handle:
+        return pickle.load(handle, encoding="latin1")
 
 
 def choose_tx_sample(
@@ -578,16 +579,17 @@ def choose_tx_sample(
         return tx_iq_file, load_iq_file(tx_iq_file)
 
     search_roots = [Path("/data"), Path("/scratch")]
-    dataset_dir = dataset_dir or discover_noisy_drone_dataset(search_roots)
+    dataset_dir = dataset_dir or discover_rml2016_dataset(search_roots)
     if dataset_dir is None:
         raise FileNotFoundError(
-            "Could not find noisy_drone_rx/NoisyDroneRFv2 samples under /data or /scratch. "
-            "Pass --tx-dataset-dir or --tx-iq-file explicitly."
+            "Could not find RML2016.10a_dict.pkl under /data or /scratch. Pass --tx-dataset-dir explicitly."
         )
-
-    files = sorted(dataset_dir.rglob("IQdata_sample*_target*_snr*.pt"))
-    if not files:
-        raise FileNotFoundError(f"No IQdata_sample*_target*_snr*.pt files found under {dataset_dir}")
+    if dataset_dir.is_dir():
+        dataset_path = dataset_dir / "RML2016.10a_dict.pkl"
+    else:
+        dataset_path = dataset_dir
+    if not dataset_path.exists():
+        raise FileNotFoundError(f"RML2016 dataset pickle not found: {dataset_path}")
 
     if class_name is not None:
         normalized = class_name.casefold()
@@ -596,32 +598,35 @@ def choose_tx_sample(
             raise ValueError(f"Unknown class name {class_name!r}; choose one of {', '.join(LABEL_NAMES)}")
         target = matching_targets[0]
 
-    filtered = []
-    for path in files:
-        file_target, file_snr = noisy_drone_file_metadata(path)
-        if target is not None and file_target != target:
+    data = load_rml2016_pickle(dataset_path)
+    candidates = []
+    for (modulation, snr), signals in data.items():
+        if target is not None and modulation != LABEL_NAMES[target]:
             continue
-        if min_snr is not None and (file_snr is None or file_snr < min_snr):
+        if min_snr is not None and snr < min_snr:
             continue
-        filtered.append(path)
-    files = filtered
-    if not files:
+        candidates.append((modulation, int(snr), signals))
+    if not candidates:
         raise FileNotFoundError(
-            f"No dataset samples matched target={target} class_name={class_name!r} min_snr={min_snr}"
+            f"No RML2016 samples matched target={target} class_name={class_name!r} min_snr={min_snr}"
         )
 
     rng = random.Random(seed)
-    path = rng.choice(files)
-    return path, load_iq_file(path)
+    modulation, snr, signals = rng.choice(candidates)
+    sample_idx = rng.randrange(len(signals))
+    signal = np.asarray(signals[sample_idx], dtype=np.float32)
+    iq = coerce_iq_array(signal)
+    pseudo_path = Path(f"RML2016_{modulation}_snr{snr}_sample{sample_idx}")
+    return pseudo_path, iq
 
 
-def describe_noisy_drone_sample(path: Path) -> str:
-    match = NOISY_DRONE_SAMPLE_RE.search(path.name)
+def describe_rml2016_sample(path: Path) -> str:
+    match = RML2016_SAMPLE_RE.search(path.name)
     if not match:
         return path.name
-    target = int(match.group("target"))
-    label = LABEL_NAMES[target] if 0 <= target < len(LABEL_NAMES) else f"target_{target}"
-    return f"{path.name} true={label} target={target} snr={match.group('snr')}dB"
+    modulation = match.group("mod")
+    target = LABEL_NAMES.index(modulation) if modulation in LABEL_NAMES else -1
+    return f"{path.name} true={modulation} target={target} snr={match.group('snr')}dB"
 
 
 def capture_on_energy(
@@ -737,17 +742,29 @@ def classify_iq(
     time_bins: int,
     labels: list[str],
     phase_tta: int = 1,
+    snr_feature: float = 18.0,
 ) -> tuple[str, float, np.ndarray]:
     phase_tta = max(1, int(phase_tta))
+    expected_samples = int(model.input_shape[1])
     if phase_tta == 1:
-        spec = iq_window_to_spectrogram(iq, nfft=nfft, hop=hop, time_bins=time_bins)
-        probs = model.predict(spec[None, ...], verbose=0)[0].astype(np.float64)
+        iq = coerce_iq_array(iq)
+        if len(iq) < expected_samples:
+            iq = np.pad(iq, ((0, expected_samples - len(iq)), (0, 0)), mode="constant")
+        iq = iq[:expected_samples].astype(np.float32, copy=False)
+        snr = np.full((expected_samples, 1), float(snr_feature), dtype=np.float32)
+        x = np.hstack([iq, snr])
+        probs = model.predict(x[None, ...], verbose=0)[0].astype(np.float64)
     else:
         complex_iq = iq_to_complex64(iq)
         specs = []
         for phase in np.linspace(0.0, 2.0 * np.pi, phase_tta, endpoint=False):
             rotated = complex_iq * np.exp(1j * phase)
-            specs.append(iq_window_to_spectrogram(coerce_iq_array(rotated), nfft=nfft, hop=hop, time_bins=time_bins))
+            rotated_iq = coerce_iq_array(rotated)
+            if len(rotated_iq) < expected_samples:
+                rotated_iq = np.pad(rotated_iq, ((0, expected_samples - len(rotated_iq)), (0, 0)), mode="constant")
+            rotated_iq = rotated_iq[:expected_samples].astype(np.float32, copy=False)
+            snr = np.full((expected_samples, 1), float(snr_feature), dtype=np.float32)
+            specs.append(np.hstack([rotated_iq, snr]))
         probs = model.predict(np.stack(specs, axis=0), verbose=0).astype(np.float64).mean(axis=0)
     top_idx = int(np.argmax(probs))
     return labels[top_idx], float(probs[top_idx]), probs
@@ -865,12 +882,13 @@ def parse_args() -> argparse.Namespace:
         "--rx-stream-args",
         help=f"Soapy RX stream args. For bladeRF, defaults to {DEFAULT_BLADERF_STREAM_ARGS!r}.",
     )
-    parser.add_argument("--window-samples", type=int, default=int(os.getenv("NOISY_DRONE_MAX_IQ_SAMPLES", "1048576")))
+    parser.add_argument("--window-samples", type=int, default=int(os.getenv("RML2016_WINDOW_SAMPLES", "128")))
     parser.add_argument("--capture-samples", type=int, help="Raw RX samples to capture before selecting a model window.")
     parser.add_argument("--burst-smooth-samples", type=int, default=512, help="Smoothing length for selecting the highest-power RX window.")
     parser.add_argument("--scan-windows", action="store_true", default=True, help="Classify candidate RX windows and choose the best one.")
     parser.add_argument("--no-scan-windows", action="store_false", dest="scan_windows", help="Disable candidate-window scanning.")
-    parser.add_argument("--scan-stride-samples", type=int, default=262144, help="Stride between candidate RX windows.")
+    parser.add_argument("--scan-stride-samples", type=int, default=16, help="Stride between candidate RX windows.")
+    parser.add_argument("--candidate-log-limit", type=int, default=12, help="Print this many top candidate windows after scanning.")
     parser.add_argument(
         "--window-score-mode",
         choices=("auto", "target", "non-noise", "raw"),
@@ -883,9 +901,10 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--threshold-db", type=float, default=8.0)
     parser.add_argument("--absolute-threshold-db", type=float)
     parser.add_argument("--trigger-timeout-sec", type=float, default=None)
-    parser.add_argument("--nfft", type=int, default=int(os.getenv("NOISY_DRONE_SPEC_NFFT", "1024")))
-    parser.add_argument("--hop", type=int, default=int(os.getenv("NOISY_DRONE_SPEC_HOP", "1024")))
-    parser.add_argument("--time-bins", type=int, default=int(os.getenv("NOISY_DRONE_SPEC_TIME_BINS", "1024")))
+    parser.add_argument("--nfft", type=int, default=int(os.getenv("RML2016_WATERFALL_NFFT", "128")))
+    parser.add_argument("--hop", type=int, default=int(os.getenv("RML2016_SPEC_HOP", "128")))
+    parser.add_argument("--time-bins", type=int, default=int(os.getenv("RML2016_SPEC_TIME_BINS", "128")))
+    parser.add_argument("--rml-snr-feature", type=float, default=18.0, help="SNR feature value appended as the third model input channel.")
     parser.add_argument("--phase-tta", type=int, default=1, help="Average predictions over this many complex phase rotations.")
     parser.add_argument("--top-k", type=int, default=3)
     parser.add_argument(
@@ -893,15 +912,14 @@ def parse_args() -> argparse.Namespace:
         choices=("hybrid", "raw", "non-noise"),
         default="hybrid",
         help=(
-            "Final label policy. hybrid keeps raw model labels except when Noise wins despite a known/captured "
-            "signal and a strong conditional non-noise class."
+            "Final label policy. For RML2016, raw and hybrid are equivalent unless a Noise class is present."
         ),
     )
     parser.add_argument(
         "--non-noise-threshold",
         type=float,
         default=0.55,
-        help="Conditional non-noise confidence needed for hybrid promotion from Noise.",
+        help="Conditional non-noise confidence needed for hybrid promotion when a Noise class is present.",
     )
     parser.add_argument(
         "--signal-margin-db",
@@ -926,12 +944,13 @@ def parse_args() -> argparse.Namespace:
         help=f"Soapy TX stream args. For bladeRF, defaults to {DEFAULT_BLADERF_STREAM_ARGS!r}.",
     )
     parser.add_argument("--tx-iq-file", type=Path, help="Specific IQ file to transmit.")
-    parser.add_argument("--tx-dataset-dir", type=Path, default=DEFAULT_TX_DATASET_DIR, help="Directory containing NoisyDroneRFv2 .pt samples.")
-    parser.add_argument("--tx-min-snr", type=int, default=DEFAULT_TX_MIN_SNR, help="Only choose NoisyDroneRFv2 samples with this SNR or higher.")
-    parser.add_argument("--tx-target", type=int, help="Only choose this NoisyDroneRFv2 target index.")
-    parser.add_argument("--tx-class-name", choices=LABEL_NAMES, default=DEFAULT_TX_CLASS_NAME, help="Only choose this NoisyDroneRFv2 class.")
+    parser.add_argument("--tx-dataset-dir", type=Path, default=DEFAULT_TX_DATASET_DIR, help="Path to RML2016.10a_dict.pkl or its parent directory.")
+    parser.add_argument("--tx-min-snr", type=int, default=DEFAULT_TX_MIN_SNR, help="Only choose RML2016 samples with this SNR or higher.")
+    parser.add_argument("--tx-target", type=int, help="Only choose this RML2016 modulation target index.")
+    parser.add_argument("--tx-class-name", choices=LABEL_NAMES, default=DEFAULT_TX_CLASS_NAME, help="Only choose this RML2016 modulation class.")
     parser.add_argument("--tx-amplitude", type=float, default=0.2)
-    parser.add_argument("--tx-pad-sec", type=float, default=0.005)
+    parser.add_argument("--tx-pad-sec", type=float, default=0.0)
+    parser.add_argument("--tx-tile-samples", type=int, default=65536, help="Tile short RML IQ samples to at least this many TX samples.")
     parser.add_argument("--tx-repeat", type=int, default=0, help="TX repeats. Use 0 to transmit until RX capture finishes.")
     parser.add_argument("--tx-seed", type=int)
     parser.add_argument("--tx-delay-sec", type=float, default=0.2)
@@ -953,25 +972,25 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--tx-test-output-csv",
         type=Path,
-        default=Path("outputs/class_sweep.csv"),
+        default=Path("outputs/rml2016_class_sweep.csv"),
         help="CSV summary path for --tx-test-all-classes.",
     )
     parser.add_argument(
         "--tx-test-output-md",
         type=Path,
-        default=Path("results/noisy_drone_rf_v2/class_sweep_results.md"),
+        default=Path("results/rml2016/class_sweep_results.md"),
         help="Markdown report path for --tx-test-all-classes.",
     )
     parser.add_argument(
         "--tx-test-save-rx-dir",
         type=Path,
-        default=Path("outputs/class_sweep_iq"),
+        default=Path("outputs/rml2016_class_sweep_iq"),
         help="Directory for per-trial RX IQ windows.",
     )
     parser.add_argument(
         "--tx-test-save-plots-dir",
         type=Path,
-        default=Path("outputs/class_sweep_plots"),
+        default=Path("outputs/rml2016_class_sweep_plots"),
         help="Directory for per-trial waterfall PNG snapshots.",
     )
     parser.add_argument("--tx-test-seed-start", type=int, default=1000, help="Base TX seed for repeatable class sweep sample choices.")
@@ -1212,11 +1231,11 @@ def write_class_sweep_markdown(
                 matrix_labels.append(label)
 
     lines = [
-        "# Live OTA Noisy Drone RF Classification Results",
+        "# Live OTA RML2016 Modulation Classification Results",
         "",
         f"Generated: `{generated_at}`",
         "",
-        "This test replays labeled NoisyDroneRF IQ samples over the air from one SDR and classifies the received "
+        "This test replays labeled RML2016.10a IQ samples over the air from one SDR and classifies the received "
         "live RF capture from another SDR. The result below is an end-to-end TX/RX hardware classification check, "
         "not just offline inference on dataset files.",
         "",
@@ -1247,12 +1266,15 @@ def write_class_sweep_markdown(
         f"| RX gain | `{args.rx_gain}` |",
         f"| TX gain | `{args.tx_gain}` |",
         f"| TX amplitude | `{args.tx_amplitude}` |",
+        f"| TX tile samples | `{args.tx_tile_samples}` |",
         f"| TX min SNR | `{args.tx_min_snr}` |",
         f"| Window samples | `{args.window_samples}` |",
-        f"| Capture samples | `{args.capture_samples if args.capture_samples is not None else args.window_samples * 4}` |",
+        f"| Capture samples | `{args.capture_samples if args.capture_samples is not None else args.window_samples * 64}` |",
+        f"| Scan stride samples | `{args.scan_stride_samples}` |",
         f"| Window score mode | `{args.window_score_mode}` |",
         f"| Decision mode | `{args.decision_mode}` |",
         f"| Non-noise threshold | `{args.non_noise_threshold}` |",
+        f"| RML SNR feature | `{args.rml_snr_feature}` |",
         "",
         "## Confusion Matrix",
         "",
@@ -1448,6 +1470,7 @@ def run_tx_class_sweep(args: argparse.Namespace) -> int:
             add_cli_arg(cmd, "--capture-samples", args.capture_samples)
             add_cli_arg(cmd, "--burst-smooth-samples", args.burst_smooth_samples)
             add_cli_arg(cmd, "--scan-stride-samples", args.scan_stride_samples)
+            add_cli_arg(cmd, "--candidate-log-limit", args.candidate_log_limit)
             add_cli_arg(cmd, "--window-score-mode", args.window_score_mode)
             add_cli_arg(cmd, "--chunk-samples", args.chunk_samples)
             add_cli_arg(cmd, "--pretrigger-chunks", args.pretrigger_chunks)
@@ -1458,6 +1481,7 @@ def run_tx_class_sweep(args: argparse.Namespace) -> int:
             add_cli_arg(cmd, "--nfft", args.nfft)
             add_cli_arg(cmd, "--hop", args.hop)
             add_cli_arg(cmd, "--time-bins", args.time_bins)
+            add_cli_arg(cmd, "--rml-snr-feature", args.rml_snr_feature)
             add_cli_arg(cmd, "--phase-tta", args.phase_tta)
             add_cli_arg(cmd, "--top-k", args.top_k)
             add_cli_arg(cmd, "--decision-mode", args.decision_mode)
@@ -1473,6 +1497,7 @@ def run_tx_class_sweep(args: argparse.Namespace) -> int:
             add_cli_arg(cmd, "--tx-min-snr", args.tx_min_snr)
             add_cli_arg(cmd, "--tx-amplitude", args.tx_amplitude)
             add_cli_arg(cmd, "--tx-pad-sec", args.tx_pad_sec)
+            add_cli_arg(cmd, "--tx-tile-samples", args.tx_tile_samples)
             add_cli_arg(cmd, "--tx-repeat", args.tx_repeat)
             add_cli_arg(cmd, "--tx-delay-sec", args.tx_delay_sec)
             add_cli_arg(cmd, "--tx-capture-mode", args.tx_capture_mode)
@@ -1564,7 +1589,7 @@ def main() -> int:
 
     model = load_model(args.model, compile=False)
     expected_shape = tuple(model.input_shape[1:])
-    script_shape = (args.nfft, args.time_bins, 2)
+    script_shape = (args.window_samples, 3)
     if expected_shape != script_shape:
         print(f"Model expects {expected_shape}; script preprocessing is configured for {script_shape}.", file=sys.stderr)
         return 2
@@ -1589,6 +1614,7 @@ def main() -> int:
             time_bins=args.time_bins,
             labels=LABEL_NAMES,
             phase_tta=1,
+            snr_feature=args.rml_snr_feature,
         )
         tx_non_noise_label, tx_non_noise_confidence = best_non_noise_prediction(tx_probs, LABEL_NAMES)
         tx_iq = prepare_tx_iq(
@@ -1597,7 +1623,10 @@ def main() -> int:
             pad_seconds=args.tx_pad_sec,
             sample_rate=args.sample_rate,
         )
-        print(f"TX sample: {describe_noisy_drone_sample(tx_path)}", flush=True)
+        if 0 < len(tx_iq) < args.tx_tile_samples:
+            repeats = int(np.ceil(args.tx_tile_samples / len(tx_iq)))
+            tx_iq = np.tile(tx_iq, (repeats, 1))[: args.tx_tile_samples].astype(np.float32, copy=False)
+        print(f"TX sample: {describe_rml2016_sample(tx_path)}", flush=True)
         print(
             f"TX file model prediction={tx_label} confidence={tx_confidence:.3f} "
             f"best_non_noise={tx_non_noise_label} non_noise_confidence={tx_non_noise_confidence:.3f}",
@@ -1679,7 +1708,7 @@ def main() -> int:
             if args.tx and args.tx_capture_mode == "direct":
                 capture_samples = args.capture_samples
                 if capture_samples is None:
-                    capture_samples = args.window_samples * 4 if args.tx else args.window_samples
+                    capture_samples = args.window_samples * 64 if args.tx else args.window_samples
                 floor_db = calibrate_noise_floor(
                     source,
                     chunk_samples=args.chunk_samples,
@@ -1728,6 +1757,7 @@ def main() -> int:
                     score_mode = "target" if args.tx and args.tx_class_name else "non-noise"
                 target_idx = LABEL_NAMES.index(args.tx_class_name) if args.tx_class_name in LABEL_NAMES else None
                 best = None
+                candidate_logs = []
                 for start in candidate_window_starts(
                     len(raw_capture),
                     args.window_samples,
@@ -1742,6 +1772,7 @@ def main() -> int:
                         time_bins=args.time_bins,
                         labels=LABEL_NAMES,
                         phase_tta=args.phase_tta,
+                        snr_feature=args.rml_snr_feature,
                     )
                     cand_non_noise_label, cand_non_noise_confidence = best_non_noise_prediction(cand_probs, LABEL_NAMES)
                     if score_mode == "target" and target_idx is not None:
@@ -1753,15 +1784,23 @@ def main() -> int:
                     else:
                         score = float(cand_confidence)
                         score_detail = f"raw:{score:.3f}"
-                    print(
-                        f"candidate start={start} score={score:.3f} {score_detail} "
-                        f"raw={cand_label}:{cand_confidence:.3f} "
-                        f"best_non_noise={cand_non_noise_label}:{cand_non_noise_confidence:.3f}",
-                        flush=True,
+                    candidate_logs.append(
+                        (
+                            score,
+                            start,
+                            f"candidate start={start} score={score:.3f} {score_detail} "
+                            f"raw={cand_label}:{cand_confidence:.3f} "
+                            f"best_non_noise={cand_non_noise_label}:{cand_non_noise_confidence:.3f}",
+                        )
                     )
                     if best is None or score > best[0]:
                         best = (score, start, candidate, cand_label, cand_confidence, cand_probs)
                 assert best is not None
+                if candidate_logs:
+                    limit = min(max(0, args.candidate_log_limit), len(candidate_logs))
+                    print(f"Top {limit}/{len(candidate_logs)} scanned candidate windows:", flush=True)
+                    for _, _, line in sorted(candidate_logs, key=lambda item: item[0], reverse=True)[:limit]:
+                        print(line, flush=True)
                 _, burst_start, capture, label, confidence, probs = best
                 print(
                     f"Selected scanned model window start={burst_start} "
@@ -1806,13 +1845,14 @@ def main() -> int:
                     time_bins=args.time_bins,
                     labels=LABEL_NAMES,
                     phase_tta=args.phase_tta,
+                    snr_feature=args.rml_snr_feature,
                 )
             non_noise_label, non_noise_confidence = best_non_noise_prediction(probs, LABEL_NAMES)
             print(
                 f"best_non_noise={non_noise_label} non_noise_confidence={non_noise_confidence:.3f}",
                 flush=True,
             )
-            if args.tx and args.tx_class_name in LABEL_NAMES and args.tx_class_name != "Noise":
+            if args.tx and args.tx_class_name in LABEL_NAMES:
                 target_idx = LABEL_NAMES.index(args.tx_class_name)
                 target_confidence = conditional_class_confidence(probs, LABEL_NAMES, target_idx)
                 print(
