@@ -1,0 +1,10 @@
+{
+  "model": "vgg_spectrogram",
+  "eval_windows": 1,
+  "natural_accuracy": 0.9768875192604006,
+  "natural_macro_f1": 0.9775421758630028,
+  "natural_weighted_f1": 0.9766794151024154,
+  "balanced_accuracy": 0.9802955665024631,
+  "balanced_macro_f1": 0.9806688379936015,
+  "balanced_weighted_f1": 0.9806688379936014
+}
