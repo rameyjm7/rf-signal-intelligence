@@ -990,7 +990,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--tx-test-save-plots-dir",
         type=Path,
-        default=Path("outputs/rml2016_class_sweep_plots"),
+        default=Path("results/rml2016/waterfalls"),
         help="Directory for per-trial waterfall PNG snapshots.",
     )
     parser.add_argument("--tx-test-seed-start", type=int, default=1000, help="Base TX seed for repeatable class sweep sample choices.")

@@ -971,7 +971,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--tx-test-save-plots-dir",
         type=Path,
-        default=Path("outputs/class_sweep_plots"),
+        default=Path("results/noisy_drone_rf_v2/waterfalls"),
         help="Directory for per-trial waterfall PNG snapshots.",
     )
     parser.add_argument("--tx-test-seed-start", type=int, default=1000, help="Base TX seed for repeatable class sweep sample choices.")
