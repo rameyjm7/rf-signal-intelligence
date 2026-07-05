@@ -99,6 +99,34 @@ def test_rfsi_parser_accepts_requested_subcommands():
     assert parser.parse_args(["train", "--config", "configs/noisy_drone_vgg.yaml"]).command == "train"
 
 
+def test_rfsi_export_onnx_defaults_to_validation_and_sidecars():
+    parser = build_parser()
+
+    args = parser.parse_args(
+        [
+            "export-onnx",
+            "--config",
+            "configs/noisy_drone_vgg.yaml",
+            "--sample-out",
+            "sample.npy",
+            "--labels-out",
+            "labels.json",
+        ]
+    )
+
+    assert args.validate is True
+    assert args.sample_out == "sample.npy"
+    assert args.labels_out == "labels.json"
+
+
+def test_rfsi_export_onnx_can_skip_validation():
+    parser = build_parser()
+
+    args = parser.parse_args(["export-onnx", "--config", "configs/noisy_drone_vgg.yaml", "--no-validate"])
+
+    assert args.validate is False
+
+
 def test_noisy_drone_train_split_and_replay_balance(tmp_path: Path):
     for target in [0, 1, 2]:
         for sample in range(10):

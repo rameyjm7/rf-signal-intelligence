@@ -6,6 +6,7 @@ import csv
 import datetime as dt
 import json
 import math
+import time
 from pathlib import Path
 from typing import Any
 
@@ -656,3 +657,139 @@ def export_noisy_drone_vgg_to_onnx(config: dict[str, Any]) -> Path:
     onnx_path.parent.mkdir(parents=True, exist_ok=True)
     tf2onnx.convert.from_keras(model, input_signature=signature, output_path=str(onnx_path))
     return onnx_path
+
+
+def noisy_drone_export_artifact_paths(config: dict[str, Any]) -> tuple[Path, Path, Path]:
+    """Resolve ONNX, sample input, and labels paths for deployment export."""
+    project_root = resolve_path(config.get("project_root", "."))
+    export_cfg = config.setdefault("export", {})
+    onnx_path = resolve_path(
+        export_cfg.get("onnx_path", "models/noisy_drone_rf_v2/noisy_drone_rf_v2_vgg_full_complex_spectrogram.onnx"),
+        base_dir=project_root,
+    )
+    sample_path = resolve_path(
+        export_cfg.get("sample_input_path", "models/noisy_drone_rf_v2/sample_input.npy"),
+        base_dir=project_root,
+    )
+    labels_path = resolve_path(
+        export_cfg.get("labels_path", "models/noisy_drone_rf_v2/labels.json"),
+        base_dir=project_root,
+    )
+    return onnx_path, sample_path, labels_path
+
+
+def write_noisy_drone_export_bundle(
+    config: dict[str, Any],
+    *,
+    sample_iq: str | Path | None = None,
+    sample_snr: float = 30.0,
+) -> dict[str, Any]:
+    """Export ONNX and write deployment sidecars: sample input and labels."""
+    project_root = resolve_path(config.get("project_root", "."))
+    onnx_path = export_noisy_drone_vgg_to_onnx(config)
+    _, sample_path, labels_path = noisy_drone_export_artifact_paths(config)
+    sample_path.parent.mkdir(parents=True, exist_ok=True)
+    labels_path.parent.mkdir(parents=True, exist_ok=True)
+
+    spec_cfg = spectrogram_config_from_mapping(config)
+    if sample_iq is not None:
+        sample = prepare_spectrogram(
+            sample_iq,
+            snr=sample_snr,
+            cache_dir=None,
+            config=spec_cfg,
+        )
+    else:
+        sample = np.zeros(spec_cfg.input_shape, dtype=np.float32)
+    np.save(sample_path, sample.astype(np.float32)[None, ...])
+
+    dataset_cfg = config.get("dataset", {})
+    data_dir = resolve_path(dataset_cfg.get("data_dir", "."), base_dir=project_root)
+    labels = None
+    if data_dir.exists():
+        records = build_manifest(
+            data_dir,
+            min_snr_db=float(dataset_cfg.get("min_snr_db", -6)),
+            data_fraction=float(dataset_cfg.get("data_fraction", 1.0)),
+            random_state=int(config.get("random_state", 1961)),
+        )
+        if records:
+            labels = label_names_from_class_stats(data_dir, sorted({record.target_raw for record in records}))
+    if labels is None:
+        labels = ["DJI", "FutabaT14", "FutabaT7", "Graupner", "Noise", "Taranis", "Turnigy"]
+    labels_path.write_text(json.dumps(labels, indent=2), encoding="utf-8")
+
+    return {
+        "onnx_path": str(onnx_path),
+        "sample_input_path": str(sample_path),
+        "labels_path": str(labels_path),
+        "input_shape": [None, *spec_cfg.input_shape],
+        "labels": labels,
+    }
+
+
+def _timed_call(fn, iterations: int) -> tuple[np.ndarray, float]:
+    result = fn()
+    start = time.perf_counter()
+    for _ in range(max(1, iterations)):
+        result = fn()
+    elapsed = (time.perf_counter() - start) / max(1, iterations)
+    return np.asarray(result), elapsed
+
+
+def validate_noisy_drone_onnx_export(
+    config: dict[str, Any],
+    *,
+    iterations: int = 20,
+    rtol: float = 1e-3,
+    atol: float = 1e-3,
+) -> dict[str, Any]:
+    """Validate ONNX Runtime inference against the configured Keras checkpoint."""
+    project_root = resolve_path(config.get("project_root", "."))
+    checkpoint = resolve_path(config["model"]["checkpoint"], base_dir=project_root)
+    onnx_path, sample_path, labels_path = noisy_drone_export_artifact_paths(config)
+    sample = np.load(sample_path).astype(np.float32)
+    labels = json.loads(labels_path.read_text(encoding="utf-8"))
+
+    import onnx
+    import onnxruntime as ort
+    from tensorflow.keras.models import load_model
+
+    onnx_model = onnx.load(onnx_path)
+    onnx.checker.check_model(onnx_model)
+
+    keras_model = load_model(checkpoint, compile=False)
+    providers = ["CUDAExecutionProvider", "CPUExecutionProvider"]
+    session = ort.InferenceSession(str(onnx_path), providers=providers)
+    input_name = session.get_inputs()[0].name
+
+    keras_probs, keras_latency = _timed_call(
+        lambda: keras_model.predict(sample, verbose=0),
+        iterations,
+    )
+    onnx_probs, onnx_latency = _timed_call(
+        lambda: session.run(None, {input_name: sample})[0],
+        iterations,
+    )
+    keras_probs = np.asarray(keras_probs[0], dtype=np.float64)
+    onnx_probs = np.asarray(onnx_probs[0], dtype=np.float64)
+    keras_idx = int(np.argmax(keras_probs))
+    onnx_idx = int(np.argmax(onnx_probs))
+    max_abs_error = float(np.max(np.abs(keras_probs - onnx_probs)))
+    mean_abs_error = float(np.mean(np.abs(keras_probs - onnx_probs)))
+    passed = bool(np.allclose(keras_probs, onnx_probs, rtol=rtol, atol=atol))
+    return {
+        "keras_top1": labels[keras_idx] if keras_idx < len(labels) else str(keras_idx),
+        "keras_confidence": float(keras_probs[keras_idx]),
+        "onnx_top1": labels[onnx_idx] if onnx_idx < len(labels) else str(onnx_idx),
+        "onnx_confidence": float(onnx_probs[onnx_idx]),
+        "top1_agreement": keras_idx == onnx_idx,
+        "max_abs_error": max_abs_error,
+        "mean_abs_error": mean_abs_error,
+        "keras_latency_ms": keras_latency * 1000.0,
+        "onnx_latency_ms": onnx_latency * 1000.0,
+        "onnx_providers": session.get_providers(),
+        "passed_tolerance": passed,
+        "rtol": float(rtol),
+        "atol": float(atol),
+    }

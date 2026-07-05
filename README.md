@@ -399,7 +399,11 @@ rfsi evaluate \
 rfsi compare --config configs/evaluation_comparison.yaml
 
 # Export the NoisyDroneRFv2 model for deployment work.
-rfsi export-onnx --config configs/noisy_drone_vgg.yaml
+rfsi export-onnx \
+  --config configs/noisy_drone_vgg.yaml \
+  --out models/noisy_drone_rf_v2/noisy_drone_rf_v2_vgg_full_complex_spectrogram.onnx \
+  --sample-out models/noisy_drone_rf_v2/sample_input.npy \
+  --labels-out models/noisy_drone_rf_v2/labels.json
 ```
 
 Suggested end-to-end flow:

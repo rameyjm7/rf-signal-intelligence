@@ -42,9 +42,9 @@ On Jetson, install the JetPack-provided TensorRT and Nsight Systems packages. Pr
 ## 1. Export To ONNX
 
 ```bash
-python exports/export_noisy_drone_to_onnx.py \
+rfsi export-onnx \
   --config configs/noisy_drone_vgg.yaml \
-  --keras-model models/noisy_drone_rf_v2/noisy_drone_rf_v2_vgg_full_complex_spectrogram_best.keras \
+  --checkpoint models/noisy_drone_rf_v2/noisy_drone_rf_v2_vgg_full_complex_spectrogram_best.keras \
   --out models/noisy_drone_rf_v2/noisy_drone_rf_v2_vgg_full_complex_spectrogram.onnx \
   --sample-out models/noisy_drone_rf_v2/sample_input.npy \
   --labels-out models/noisy_drone_rf_v2/labels.json
@@ -58,7 +58,11 @@ Outputs:
 
 Pass `--sample-iq path/to/IQdata_sample...pt` to save a real spectrogram sample instead of a zero-valued shape sample.
 
+By default this command also validates ONNX Runtime output against the Keras checkpoint. Use `--no-validate` only when you are exporting on a machine without `onnxruntime` installed.
+
 ## 2. Validate ONNX Against Keras
+
+The export command validates by default. To run validation separately:
 
 ```bash
 python exports/validate_onnx.py \

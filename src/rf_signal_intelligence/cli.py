@@ -17,8 +17,9 @@ from rf_signal_intelligence.workflows.comparison import (
 )
 from rf_signal_intelligence.workflows.noisy_drone_vgg import (
     evaluate_noisy_drone_vgg,
-    export_noisy_drone_vgg_to_onnx,
     train_noisy_drone_vgg,
+    validate_noisy_drone_onnx_export,
+    write_noisy_drone_export_bundle,
 )
 
 
@@ -43,6 +44,15 @@ def build_parser() -> argparse.ArgumentParser:
     export.add_argument("--config", required=True, help="Workflow YAML config.")
     export.add_argument("--checkpoint", help="Override model checkpoint path.")
     export.add_argument("--out", help="Override ONNX output path.")
+    export.add_argument("--sample-out", help="Override sample_input.npy output path.")
+    export.add_argument("--labels-out", help="Override labels.json output path.")
+    export.add_argument("--sample-iq", help="Optional .pt IQ sample to convert into sample_input.npy.")
+    export.add_argument("--sample-snr", type=float, default=30.0, help="SNR metadata for --sample-iq.")
+    export.add_argument("--validate", dest="validate", action="store_true", default=True)
+    export.add_argument("--no-validate", dest="validate", action="store_false")
+    export.add_argument("--validation-iterations", type=int, default=20)
+    export.add_argument("--rtol", type=float, default=1e-3)
+    export.add_argument("--atol", type=float, default=1e-3)
     return parser
 
 
@@ -106,10 +116,28 @@ def run_export_onnx(args: argparse.Namespace) -> int:
         config.setdefault("model", {})["checkpoint"] = args.checkpoint
     if args.out:
         config.setdefault("export", {})["onnx_path"] = args.out
+    if args.sample_out:
+        config.setdefault("export", {})["sample_input_path"] = args.sample_out
+    if args.labels_out:
+        config.setdefault("export", {})["labels_path"] = args.labels_out
     workflow = config.get("workflow")
     if workflow == "noisy_drone_vgg":
-        onnx_path = export_noisy_drone_vgg_to_onnx(config)
-        print(f"Wrote {onnx_path}")
+        payload = write_noisy_drone_export_bundle(
+            config,
+            sample_iq=args.sample_iq,
+            sample_snr=args.sample_snr,
+        )
+        if args.validate:
+            payload["validation"] = validate_noisy_drone_onnx_export(
+                config,
+                iterations=args.validation_iterations,
+                rtol=args.rtol,
+                atol=args.atol,
+            )
+            if not payload["validation"]["passed_tolerance"]:
+                print(payload)
+                return 1
+        print(payload)
         return 0
     raise ValueError(f"Unsupported ONNX export workflow: {workflow!r}")
 
