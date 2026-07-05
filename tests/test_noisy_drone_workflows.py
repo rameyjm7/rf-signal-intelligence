@@ -13,6 +13,7 @@ from ml_wireless_classification.features.spectrogram import (
     find_burst_start,
     iq_to_full_complex_spectrogram,
 )
+from ml_wireless_classification.plots import modulation_accuracy_traces_by_snr
 from ml_wireless_classification.workflows.comparison import comparison_row
 
 
@@ -92,3 +93,31 @@ def test_rfsi_parser_accepts_requested_subcommands():
     assert parser.parse_args(["compare", "--config", "configs/evaluation_comparison.yaml"]).command == "compare"
     assert parser.parse_args(["export-onnx", "--config", "configs/noisy_drone_vgg.yaml"]).command == "export-onnx"
     assert parser.parse_args(["train", "--config", "configs/noisy_drone_vgg.yaml"]).command == "train"
+
+
+def test_modulation_accuracy_traces_by_snr_sorts_by_peak_accuracy():
+    class FakeModel:
+        def predict(self, x, verbose=False):
+            # Class 0 is always correct; class 1 is always predicted as class 0.
+            pred = np.zeros((len(x), 2), dtype=np.float32)
+            pred[:, 0] = 1.0
+            return pred
+
+    x_test = np.array(
+        [
+            [[0, 0, 0]],
+            [[0, 0, 10]],
+            [[0, 0, 0]],
+            [[0, 0, 10]],
+        ],
+        dtype=np.float32,
+    )
+    y_test = np.array([0, 0, 1, 1], dtype=np.int64)
+
+    traces, snrs = modulation_accuracy_traces_by_snr(FakeModel(), x_test, y_test, ["a", "b"])
+
+    assert snrs == [np.float32(0.0), np.float32(10.0)]
+    assert traces[0][0] == "a"
+    assert traces[0][2] == 100.0
+    assert traces[1][0] == "b"
+    assert traces[1][2] == 0.0

@@ -72,3 +72,87 @@ def write_per_class_snr_csv(
             ]
             writer.writerow([name, *row])
     return output
+
+
+def modulation_accuracy_traces_by_snr(model, x_test, y_test, class_names: list[str]):
+    """Compute per-modulation SNR accuracy traces sorted by peak accuracy."""
+    snr_values = sorted(set(x_test[:, 0, -1]))
+    traces = []
+    for class_index, class_name in enumerate(class_names):
+        accuracies = []
+        for snr in snr_values:
+            mask = np.where((y_test == class_index) & (x_test[:, 0, -1] == snr))
+            x_slice = x_test[mask]
+            y_slice = y_test[mask]
+            if len(y_slice) > 0:
+                y_pred = np.argmax(model.predict(x_slice, verbose=False), axis=1)
+                accuracy = float(np.mean(y_pred == y_slice)) * 100.0
+            else:
+                accuracy = np.nan
+            accuracies.append(accuracy)
+
+        valid = [value for value in accuracies if not np.isnan(value)]
+        peak_accuracy = max(valid) if valid else 0.0
+        peak_snr = snr_values[accuracies.index(peak_accuracy)] if peak_accuracy > 0 else None
+        traces.append((class_name, accuracies, peak_accuracy, peak_snr))
+    return sorted(traces, key=lambda row: row[2], reverse=True), snr_values
+
+
+def plot_modulation_accuracy_v_snr(
+    model,
+    x_test,
+    y_test,
+    label_encoder,
+    *,
+    top_n: int = 6,
+    bottom_n: int = 5,
+):
+    """Plot all, top, and bottom modulation accuracy-vs-SNR traces."""
+    import matplotlib.pyplot as plt
+
+    traces, snr_values = modulation_accuracy_traces_by_snr(
+        model,
+        x_test,
+        y_test,
+        list(label_encoder.classes_),
+    )
+
+    def plot_group(group, title):
+        plt.figure(figsize=(12, 8))
+        for modulation, accuracies, peak_accuracy, peak_snr in group:
+            label = (
+                f"{modulation} (Peak: {peak_accuracy:.2f}% at {peak_snr} dB)"
+                if peak_accuracy > 0
+                else modulation
+            )
+            plt.plot(snr_values, accuracies, "-o", label=label)
+            if peak_accuracy > 0 and peak_snr is not None:
+                plt.plot(peak_snr, peak_accuracy, "ro")
+                plt.text(
+                    peak_snr,
+                    peak_accuracy + 1,
+                    f"{peak_accuracy:.2f}%",
+                    ha="center",
+                    va="bottom",
+                    fontsize=10,
+                    bbox={"facecolor": "white", "edgecolor": "black", "boxstyle": "round,pad=0.3"},
+                )
+        plt.xlabel("SNR (dB)")
+        plt.ylabel("Recognition Accuracy (%)")
+        plt.title(title)
+        plt.legend(loc="lower right")
+        plt.grid(True)
+        plt.ylim(0, 110)
+        plt.xlim(min(snr_values), max(snr_values))
+        plt.show()
+
+    plot_group(traces, "Recognition Accuracy vs. SNR per Modulation Type (All Classifications)")
+    plot_group(
+        traces[:top_n],
+        f"Recognition Accuracy vs. SNR per Modulation Type (Top {top_n} by Peak Accuracy)",
+    )
+    plot_group(
+        traces[-bottom_n:],
+        f"Recognition Accuracy vs. SNR per Modulation Type (Bottom {bottom_n} by Peak Accuracy)",
+    )
+    return traces
