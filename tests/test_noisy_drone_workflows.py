@@ -15,6 +15,10 @@ from rf_signal_intelligence.features.spectrogram import (
 )
 from rf_signal_intelligence.plots import modulation_accuracy_traces_by_snr
 from rf_signal_intelligence.workflows.comparison import comparison_row
+from rf_signal_intelligence.workflows.noisy_drone_vgg import (
+    balanced_replay_records,
+    split_noisy_drone_records,
+)
 
 
 def test_parse_noisy_drone_filename_extracts_metadata():
@@ -93,6 +97,32 @@ def test_rfsi_parser_accepts_requested_subcommands():
     assert parser.parse_args(["compare", "--config", "configs/evaluation_comparison.yaml"]).command == "compare"
     assert parser.parse_args(["export-onnx", "--config", "configs/noisy_drone_vgg.yaml"]).command == "export-onnx"
     assert parser.parse_args(["train", "--config", "configs/noisy_drone_vgg.yaml"]).command == "train"
+
+
+def test_noisy_drone_train_split_and_replay_balance(tmp_path: Path):
+    for target in [0, 1, 2]:
+        for sample in range(10):
+            (tmp_path / f"IQdata_sample{target * 100 + sample}_target{target}_snr20.pt").touch()
+    records = build_manifest(tmp_path, min_snr_db=0)
+
+    train_records, val_records, test_records = split_noisy_drone_records(
+        records,
+        test_size=0.20,
+        validation_size=0.25,
+        random_state=7,
+    )
+    replay_records = balanced_replay_records(train_records, samples_per_class=8, random_state=7)
+
+    assert len(train_records) == 18
+    assert len(val_records) == 6
+    assert len(test_records) == 6
+    assert {record.label_idx for record in train_records} == {0, 1, 2}
+    assert len(replay_records) == 24
+    assert {label: sum(record.label_idx == label for record in replay_records) for label in [0, 1, 2]} == {
+        0: 8,
+        1: 8,
+        2: 8,
+    }
 
 
 def test_modulation_accuracy_traces_by_snr_sorts_by_peak_accuracy():

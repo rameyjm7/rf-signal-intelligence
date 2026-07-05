@@ -18,6 +18,7 @@ from rf_signal_intelligence.workflows.comparison import (
 from rf_signal_intelligence.workflows.noisy_drone_vgg import (
     evaluate_noisy_drone_vgg,
     export_noisy_drone_vgg_to_onnx,
+    train_noisy_drone_vgg,
 )
 
 
@@ -55,10 +56,9 @@ def run_train(args: argparse.Namespace) -> int:
     config = _load_workflow_config(args.config)
     workflow = config.get("workflow")
     if workflow == "noisy_drone_vgg":
-        raise NotImplementedError(
-            "Config-driven NoisyDroneRFv2 training is planned; use notebook 33 until "
-            "the training loop is fully migrated. Evaluation/export are available now."
-        )
+        payload = train_noisy_drone_vgg(config)
+        print(payload)
+        return 0
     raise ValueError(f"Unsupported training workflow: {workflow!r}")
 
 

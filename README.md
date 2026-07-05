@@ -292,6 +292,9 @@ The preferred reproducible workflow is moving from notebook-only execution to th
 `rfsi` CLI plus small notebooks that call reusable code under `src/`.
 
 ```bash
+# Train or continue the canonical NoisyDroneRFv2 VGG spectrogram model.
+rfsi train --config configs/noisy_drone_vgg.yaml
+
 # Evaluate the canonical NoisyDroneRFv2 VGG spectrogram model.
 rfsi evaluate \
   --config configs/noisy_drone_vgg.yaml \
