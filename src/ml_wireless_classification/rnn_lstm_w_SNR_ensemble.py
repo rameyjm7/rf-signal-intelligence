@@ -1,10 +1,8 @@
-"""Legacy compatibility shim.
+"""Compatibility wrapper for archived ensemble notebook imports.
 
-Archive notebooks historically imported `ModulationLSTMClassifier` from this module.
-The maintained implementation now lives in
-`ml_wireless_classification.models.rnn_lstm_with_snr`.
+The legacy import target now lives in `ml_wireless_classification.legacy`.
 """
 
-from ml_wireless_classification.models.rnn_lstm_with_snr import ModulationLSTMClassifier
+from ml_wireless_classification.legacy.rnn_lstm_w_snr_ensemble import ModulationLSTMClassifier
 
 __all__ = ["ModulationLSTMClassifier"]
