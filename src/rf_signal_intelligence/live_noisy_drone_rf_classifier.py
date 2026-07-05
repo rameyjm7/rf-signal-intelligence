@@ -1759,6 +1759,7 @@ def main() -> int:
                 tx_worker.join(timeout=1.0)
             raw_capture = capture
             probs = None
+            inference_start = time.perf_counter()
             if args.scan_windows and len(raw_capture) > args.window_samples:
                 score_mode = args.window_score_mode
                 if score_mode == "auto":
@@ -1844,6 +1845,12 @@ def main() -> int:
                     labels=LABEL_NAMES,
                     phase_tta=args.phase_tta,
                 )
+            inference_elapsed = max(time.perf_counter() - inference_start, 1e-9)
+            print(
+                f"Inference latency {inference_elapsed * 1000.0:.1f} ms, "
+                f"throughput {float(len(raw_capture)) / inference_elapsed:.0f} samples/s",
+                flush=True,
+            )
             non_noise_label, non_noise_confidence = best_non_noise_prediction(probs, LABEL_NAMES)
             print(
                 f"best_non_noise={non_noise_label} non_noise_confidence={non_noise_confidence:.3f}",

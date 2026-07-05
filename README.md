@@ -243,6 +243,83 @@ Existing result snapshots are retained below for continuity.
 | **Weighted avg** | **0.98** | **0.98** | **0.98** | **203** |
 
 
+## Live RF Drone Classifier
+
+Run the NoisyDroneRFv2 model against IQ playback, live SDR receive, or SDR-to-SDR over-the-air replay.
+
+Pipeline:
+
+```text
+IQ source -> windowing -> preprocessing/spectrogram -> model inference -> class/confidence -> latency/throughput reporting
+```
+
+The live script accepts `.npy`, `.npz`, `.pt`, and raw complex64 `.bin` / `.c64` IQ files for playback. It also supports SoapySDR receive and an optional TX path for replaying labeled NoisyDroneRFv2 samples from one SDR into another.
+
+IQ file playback:
+
+```bash
+python scripts/live_noisy_drone_rf_classifier.py \
+  --iq-file outputs/rx_debug.npy \
+  --model models/noisy_drone_rf_v2/noisy_drone_rf_v2_vgg_full_complex_spectrogram_best.keras \
+  --window-samples 1048576 \
+  --nfft 1024 \
+  --hop 1024 \
+  --time-bins 1024 \
+  --once
+```
+
+Live SDR receive with SoapySDR:
+
+```bash
+python scripts/live_noisy_drone_rf_classifier.py \
+  --device-args driver=hackrf \
+  --freq 2.399e9 \
+  --sample-rate 20e6 \
+  --bandwidth 20e6 \
+  --gain 60 \
+  --model models/noisy_drone_rf_v2/noisy_drone_rf_v2_vgg_full_complex_spectrogram_best.keras
+```
+
+SDR-to-SDR replay and receive demo:
+
+```bash
+python scripts/live_noisy_drone_rf_classifier.py \
+  --tx \
+  --tx-dataset-dir /data/rameyjm7/datasets/NoisyDroneRFv2 \
+  --tx-class-name DJI \
+  --tx-min-snr 24 \
+  --device-args driver=hackrf \
+  --tx-device-args driver=bladerf \
+  --freq 2.399e9 \
+  --sample-rate 20e6 \
+  --bandwidth 20e6 \
+  --tx-bandwidth 20e6 \
+  --gain 60 \
+  --tx-gain 60 \
+  --once \
+  --save-rx-iq outputs/rx_debug.npy
+```
+
+Reproduce the documented OTA class-sweep report:
+
+```bash
+python scripts/live_noisy_drone_rf_classifier.py \
+  --tx-test-all-classes \
+  --tx-test-classes DJI,FutabaT14,FutabaT7,Graupner,Noise,Taranis,Turnigy \
+  --tx-test-count 10 \
+  --tx-min-snr 20 \
+  --tx-test-output-csv outputs/noisy_drone_rf_v2_snr20_class_sweep.csv \
+  --tx-test-output-md results/noisy_drone_rf_v2/snr20_class_sweep_results.md \
+  --tx-test-save-rx-dir outputs/noisy_drone_rf_v2_snr20_iq \
+  --tx-test-save-plots-dir results/noisy_drone_rf_v2/snr20_waterfalls
+```
+
+Suggested resume bullet:
+
+```text
+Built a live RF drone-classification pipeline with IQ playback/receive, windowed preprocessing, spectrogram-based deep-learning inference, confidence reporting, and latency instrumentation for real-time RF sensor-processing workflows.
+```
+
 
 ## Requirements
 
