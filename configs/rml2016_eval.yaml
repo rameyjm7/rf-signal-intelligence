@@ -1,0 +1,14 @@
+workflow: rml2016_eval
+project_root: .
+outputs_dir: outputs/rml2016_eval
+random_state: 42
+
+dataset:
+  pkl: /scratch/rameyjm7/datasets/RML2016/RML2016.10a_dict.pkl
+
+model:
+  id: rml2016_lstm_rnn_2024
+  checkpoint: models/rml2016/rml2016_lstm_rnn_2024.keras
+
+evaluation:
+  test_size: 0.20

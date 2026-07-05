@@ -6,6 +6,11 @@ import argparse
 from pathlib import Path
 
 from ml_wireless_classification.config import load_yaml_config, resolve_path
+from ml_wireless_classification.workflows.classic_evaluation import (
+    evaluate_deepradar2022,
+    evaluate_rml2016,
+    evaluate_rml2018,
+)
 from ml_wireless_classification.workflows.comparison import (
     build_comparison_rows,
     write_comparison_outputs,
@@ -64,6 +69,18 @@ def run_evaluate(args: argparse.Namespace) -> int:
     workflow = config.get("workflow")
     if workflow == "noisy_drone_vgg":
         metrics = evaluate_noisy_drone_vgg(config)
+        print(metrics)
+        return 0
+    if workflow == "rml2016_eval":
+        metrics = evaluate_rml2016(config)
+        print(metrics)
+        return 0
+    if workflow == "rml2018_eval":
+        metrics = evaluate_rml2018(config)
+        print(metrics)
+        return 0
+    if workflow == "deepradar2022_eval":
+        metrics = evaluate_deepradar2022(config)
         print(metrics)
         return 0
     raise ValueError(f"Unsupported evaluation workflow: {workflow!r}")
