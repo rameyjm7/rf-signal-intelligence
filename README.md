@@ -110,6 +110,10 @@ Model cards are available under [`docs/model_cards/`](docs/model_cards/):
 - [RML2018 LSTM](docs/model_cards/rml2018_lstm.md)
 - [DeepRadar2022 CNN-transformer](docs/model_cards/deepradar2022_cnn_transformer.md)
 
+NVIDIA edge deployment path:
+
+- [Jetson TensorRT deployment guide](docs/jetson_tensorrt_deployment.md)
+
 ## Results: RML2016
 
 ### Summary

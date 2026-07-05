@@ -94,4 +94,4 @@ The live script reports per-window inference latency and throughput. The practic
 
 - Keras checkpoint: available.
 - ONNX export path: `rfsi export-onnx --config configs/noisy_drone_vgg.yaml`.
-- TensorRT / Jetson deployment: planned follow-on under `docs/future_improvements/jetson_tensorrt_rf_inference_plan.md`.
+- First-class ONNX to TensorRT / Jetson deployment path: `docs/jetson_tensorrt_deployment.md`.
