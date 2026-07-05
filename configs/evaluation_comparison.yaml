@@ -1,0 +1,37 @@
+project_root: .
+output_csv: outputs/50_evaluation_comparison/50_cross_dataset_model_comparison.csv
+output_json: outputs/50_evaluation_comparison/50_cross_dataset_model_comparison.json
+
+metrics:
+  - dataset: noisy_drone_rf_v2
+    model_name: noisy_drone_rf_v2_vgg_full_complex_spectrogram
+    model_family: vgg_full_complex_spectrogram
+    split: natural_test
+    source: outputs/noisy_drone_rf_v2_eval/44_noisy_drone_rf_v2_vgg_full_complex_spectrogram_metrics.json
+    accuracy_key: accuracy
+    macro_f1_key: macro_f1
+    weighted_f1_key: weighted_f1
+    model_path: models/noisy_drone_rf_v2/noisy_drone_rf_v2_vgg_full_complex_spectrogram_best.keras
+    notes: NoisyDroneRFv2 notebook 44 eval metrics
+
+  - dataset: rml2016
+    model_name: cnn_transformer
+    model_family: cnn_transformer
+    source: outputs/rml2016/rml2016_cnn_transformer_comparison.json
+    optional: true
+    notes: RML2016 comparison artifact
+
+  - dataset: rml2018
+    model_name: lstm
+    model_family: lstm
+    source: outputs/rml2018/rml2018_checkpoint_metrics.json
+    accuracy_key: eval_accuracy
+    optional: true
+    notes: RML2018 checkpoint metrics
+
+  - dataset: deepradar2022
+    model_name: deepradar2022_cnn_transformer
+    model_family: cnn_transformer
+    source: outputs/deepradar2022/deepradar2022_cnn_transformer_stage2_result.json
+    optional: true
+    notes: DeepRadar2022 stage 2 artifact

@@ -66,6 +66,9 @@ Notebook `50` now evaluates Noisy Drone RF v2 in a dedicated eval-only cell and 
 ```text
 src/ml_wireless_classification/   Python package
   core/                           Maintained runtime/training components
+  data/                           Dataset manifests and IQ loading helpers
+  features/                       Reusable RF feature extraction
+  workflows/                      Config-driven training/evaluation/export workflows
   models/                         Maintained model definitions
   legacy/                         Experimental utilities kept for archive notebooks
   base/                           Backward-compatible import wrappers
@@ -277,7 +280,36 @@ If your dataset is elsewhere, pass `--data-path`.
 
 ## CLI Usage
 
-Run as module:
+The preferred reproducible workflow is moving from notebook-only execution to the
+`rfsi` CLI plus small notebooks that call reusable code under `src/`.
+
+```bash
+# Evaluate the canonical NoisyDroneRFv2 VGG spectrogram model.
+rfsi evaluate \
+  --config configs/noisy_drone_vgg.yaml \
+  --checkpoint models/noisy_drone_rf_v2/noisy_drone_rf_v2_vgg_full_complex_spectrogram_best.keras
+
+# Rebuild the cross-dataset comparison artifacts.
+rfsi compare --config configs/evaluation_comparison.yaml
+
+# Export the NoisyDroneRFv2 model for deployment work.
+rfsi export-onnx --config configs/noisy_drone_vgg.yaml
+```
+
+Suggested end-to-end flow:
+
+1. Install the package.
+2. Download datasets or point `configs/local_data_paths.yaml` / workflow configs at local data.
+3. Train or evaluate with `rfsi`.
+4. Export artifacts and comparison tables.
+5. Reproduce the headline metrics table.
+6. Run the live SDR classifier.
+7. Deploy the exported ONNX model through TensorRT / Jetson.
+
+Older notebooks are retained, but the largest NoisyDroneRFv2 and comparison notebooks now act
+as thin wrappers around reusable Python modules.
+
+Legacy RML2016 entrypoint:
 
 ```bash
 python -m ml_wireless_classification --mode evaluate_only

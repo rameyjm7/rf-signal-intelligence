@@ -1,0 +1,30 @@
+workflow: noisy_drone_vgg
+project_root: .
+outputs_dir: outputs/noisy_drone_rf_v2_eval
+cache_dir: /scratch/rameyjm7/ML-wireless-signal-classification/cache/noisy_drone_rf_v2/spectrogram_full_complex_cache
+random_state: 1961
+
+dataset:
+  data_dir: /scratch/rameyjm7/datasets/NoisyDroneRFv2
+  min_snr_db: -6
+  data_fraction: 0.25
+
+model:
+  id: noisy_drone_rf_v2_vgg_full_complex_spectrogram
+  checkpoint: models/noisy_drone_rf_v2/noisy_drone_rf_v2_vgg_full_complex_spectrogram_best.keras
+
+features:
+  sample_len: 1048576
+  nfft: 1024
+  hop: 1024
+  time_bins: 1024
+  burst_smooth_samples: 512
+
+evaluation:
+  test_size: 0.20
+  batch_size: 8
+  limit: 0
+
+export:
+  onnx_path: models/noisy_drone_rf_v2/noisy_drone_rf_v2_vgg_full_complex_spectrogram.onnx
+  input_name: input

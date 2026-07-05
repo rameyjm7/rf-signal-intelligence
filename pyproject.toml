@@ -43,6 +43,7 @@ gpu = [
 [project.scripts]
 start = "ml_wireless_classification:create_app"
 ml-wireless-classification = "ml_wireless_classification:main"
+rfsi = "ml_wireless_classification.cli:main"
 
 [tool.setuptools]
 package-dir = { "" = "src" }
