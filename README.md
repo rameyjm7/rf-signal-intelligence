@@ -420,6 +420,16 @@ models/noisy_drone_rf_v2/run_onnx_inference.sh \
   --window-score-mode target \
   --decision-mode non-noise \
   --providers CPUExecutionProvider
+
+# Run one high-SNR dataset sample per class and print a readable table.
+models/noisy_drone_rf_v2/run_onnx_inference.sh \
+  --class-sweep \
+  --dataset-dir /data/rameyjm7/datasets/NoisyDroneRFv2 \
+  --min-snr 20 \
+  --samples-per-class 1 \
+  --max-predictions 8 \
+  --format table \
+  --providers CPUExecutionProvider
 ```
 
 Suggested end-to-end flow:

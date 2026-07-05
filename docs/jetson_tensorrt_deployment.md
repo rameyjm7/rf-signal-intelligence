@@ -86,6 +86,19 @@ models/noisy_drone_rf_v2/run_onnx_inference.sh \
   --providers CPUExecutionProvider
 ```
 
+Run a compact per-class sanity check against mounted NoisyDroneRFv2 data:
+
+```bash
+models/noisy_drone_rf_v2/run_onnx_inference.sh \
+  --class-sweep \
+  --dataset-dir /data/rameyjm7/datasets/NoisyDroneRFv2 \
+  --min-snr 20 \
+  --samples-per-class 1 \
+  --max-predictions 8 \
+  --format table \
+  --providers CPUExecutionProvider
+```
+
 ## 2. Validate ONNX Against Keras
 
 The export command validates by default. To run validation separately:

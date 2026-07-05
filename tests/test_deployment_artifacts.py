@@ -56,5 +56,11 @@ def test_local_onnx_inference_script_exposes_expected_flags():
         "--decision-mode",
         "--target-class",
         "--window-score-mode",
+        "--class-sweep",
+        "--dataset-dir",
+        "--samples-per-class",
+        "--max-predictions",
+        "--min-snr",
+        "--format",
     ]:
         assert flag in text
