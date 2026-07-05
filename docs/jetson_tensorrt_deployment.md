@@ -165,6 +165,8 @@ Output: 1x7
 Command: sudo env DURATION=5 WARMUP=100 ITERATIONS=100 ./benchmark_engine.sh
 ```
 
+Committed benchmark/profile summary: `results/benchmarks/noisy_drone_tensorrt_jetson.md`.
+
 ## 5. Run TensorRT Engine Inference
 
 Use the direct TensorRT runner to verify that the built engine produces decoded class predictions, not just benchmark timings:
@@ -234,12 +236,30 @@ This is useful when ONNX Runtime CUDA or TensorRT execution providers are instal
 
 ## 7. Profile With Nsight Systems
 
+Install Nsight Systems on the Jetson if `nsys` is not present. Prefer the NVIDIA Jetson repo package over Ubuntu's older `nsight-systems` package:
+
 ```bash
-bash deploy/nsight_profile.sh \
-  --onnx models/noisy_drone_rf_v2/noisy_drone_rf_v2_vgg_full_complex_spectrogram.onnx \
-  --sample models/noisy_drone_rf_v2/sample_input.npy \
-  --labels models/noisy_drone_rf_v2/labels.json \
-  --iterations 200
+sudo apt-get update
+sudo apt-get install -y nsight-systems-2024.5.4
+```
+
+The helper auto-detects `nsys` from `PATH` and common Jetson package paths. If your install is elsewhere, pass `NSYS=/path/to/nsys`.
+
+Capture a TensorRT engine profile:
+
+```bash
+sudo OUT=outputs/nsight/noisy_drone_tensorrt \
+  ITERATIONS=20 \
+  bash deploy/nsight_profile.sh
+```
+
+To profile a different preprocessed validation sample:
+
+```bash
+sudo OUT=outputs/nsight/noisy_drone_tensorrt_dji \
+  SAMPLE=validation_samples/DJI.npy \
+  ITERATIONS=20 \
+  bash deploy/nsight_profile.sh
 ```
 
 Profile goals:
