@@ -1,5 +1,39 @@
-Copyright (c) 2024 Jacob M Ramey
+RF Signal Intelligence Non-Commercial License
 
-This software is licensed for non-commercial use only. You may use, distribute, and modify the software for personal, educational, or research purposes, but not for commercial purposes without permission from the original author. The original author retains all commercial rights to this software.
+Copyright (c) 2024-2026 Jacob M. Ramey
 
-For the DeepSig data, it is licensed for non-commercial use as well.
+This repository's original software, notebooks, scripts, documentation, model
+workflow code, and generated project artifacts authored by Jacob M. Ramey are
+free to use, copy, modify, and distribute for personal, educational, research,
+and other non-commercial purposes.
+
+Commercialization Rights Reserved
+
+Jacob M. Ramey and/or RTG LLC retain the exclusive right to commercialize this
+work. Commercial use, sale, sublicensing, paid deployment, commercial hosting,
+integration into commercial products or services, or other revenue-generating use
+requires prior written permission from Jacob M. Ramey or RTG LLC.
+
+For commercial licensing or permission requests, contact:
+
+Jacob M. Ramey
+rameyjm7@gmail.com
+jake.rtgllc@gmail.com
+
+Third-Party Datasets And Artifacts
+
+This license applies only to original work in this repository. It does not grant
+ownership of, or additional rights to, third-party datasets, pretrained external
+artifacts, or source materials used by the project.
+
+In particular, Jacob M. Ramey and RTG LLC do not claim ownership of datasets
+provided by DeepSig, including RadioML datasets, or any other third-party dataset
+referenced by this repository. Those datasets remain subject to their original
+owners' licenses, terms, and redistribution restrictions.
+
+No Warranty
+
+This work is provided "as is", without warranty of any kind, express or implied,
+including but not limited to warranties of merchantability, fitness for a
+particular purpose, and non-infringement. The authors and rights holders are not
+liable for any claim, damages, or other liability arising from use of this work.
