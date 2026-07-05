@@ -7,14 +7,14 @@ from typing import Any
 
 import numpy as np
 
-from ml_wireless_classification.config import resolve_path
-from ml_wireless_classification.data.noisy_drone import (
+from rf_signal_intelligence.config import resolve_path
+from rf_signal_intelligence.data.noisy_drone import (
     build_manifest,
     label_names_from_class_stats,
     load_pt_iq,
 )
-from ml_wireless_classification.evaluation import classification_metrics, write_metrics_json
-from ml_wireless_classification.features.spectrogram import (
+from rf_signal_intelligence.evaluation import classification_metrics, write_metrics_json
+from rf_signal_intelligence.features.spectrogram import (
     SpectrogramConfig,
     find_burst_start,
     iq_to_full_complex_spectrogram,

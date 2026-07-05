@@ -51,7 +51,7 @@ Initial experiments with a Spectral Transformer using I/Q patches as tokens.
 These documents serve as the reference material for the experiments and architectures found in:
 
 - notebooks/
-- src/ml_wireless_classification/
+- src/rf_signal_intelligence/
 - models/
 - docker/
 

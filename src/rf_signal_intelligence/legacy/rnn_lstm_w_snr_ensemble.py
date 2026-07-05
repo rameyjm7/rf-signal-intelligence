@@ -2,6 +2,6 @@
 
 from __future__ import annotations
 
-from ml_wireless_classification.models.rnn_lstm_with_snr import ModulationLSTMClassifier
+from rf_signal_intelligence.models.rnn_lstm_with_snr import ModulationLSTMClassifier
 
 __all__ = ["ModulationLSTMClassifier"]

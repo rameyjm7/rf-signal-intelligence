@@ -28,9 +28,9 @@ from tensorflow.keras.callbacks import TensorBoard
 import seaborn as sns
 
 from scipy.signal import hilbert
-from ml_wireless_classification.legacy.signal_utils import cyclical_lr
-from ml_wireless_classification.core.run_mode import common_vars, RUN_MODE
-from ml_wireless_classification.core.callbacks import CustomEarlyStopping
+from rf_signal_intelligence.legacy.signal_utils import cyclical_lr
+from rf_signal_intelligence.core.run_mode import common_vars, RUN_MODE
+from rf_signal_intelligence.core.callbacks import CustomEarlyStopping
 
 
 

@@ -12,7 +12,7 @@ SRC_ROOT = PROJECT_ROOT / "src"
 if str(SRC_ROOT) not in sys.path:
     sys.path.insert(0, str(SRC_ROOT))
 
-from ml_wireless_classification.live_rml2016_rf_classifier import main
+from rf_signal_intelligence.live_rml2016_rf_classifier import main
 
 
 if __name__ == "__main__":

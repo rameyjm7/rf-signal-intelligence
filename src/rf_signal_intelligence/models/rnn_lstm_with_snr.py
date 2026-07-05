@@ -12,9 +12,9 @@ from tensorflow.keras.layers import (
 from tensorflow.keras.models import Sequential
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
-from ml_wireless_classification.core.base_classifier import BaseModulationClassifier
+from rf_signal_intelligence.core.base_classifier import BaseModulationClassifier
 
-from ml_wireless_classification.core.run_mode import common_vars, RUN_MODE
+from rf_signal_intelligence.core.run_mode import common_vars, RUN_MODE
 
 
 class ModulationLSTMClassifier(BaseModulationClassifier):

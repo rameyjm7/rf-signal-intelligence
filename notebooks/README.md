@@ -9,7 +9,7 @@ Notebook execution order and naming convention:
 Notebook convention:
 
 - Keep notebooks as thin orchestration and visualization layers.
-- Put reusable dataset loading, feature extraction, evaluation, and artifact-writing code under `src/ml_wireless_classification/`.
+- Put reusable dataset loading, feature extraction, evaluation, and artifact-writing code under `src/rf_signal_intelligence/`.
 - Prefer the `rfsi` CLI for reproducible runs that should not require opening a notebook.
 
 Current notebooks:

@@ -8,12 +8,12 @@ from sklearn.preprocessing import LabelEncoder
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense
 from tensorflow.keras.utils import to_categorical
-from ml_wireless_classification.core.base_classifier import BaseModulationClassifier
+from rf_signal_intelligence.core.base_classifier import BaseModulationClassifier
 import os
 
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
-from ml_wireless_classification.legacy.signal_utils import (
+from rf_signal_intelligence.legacy.signal_utils import (
     compute_fft_features,
     compute_instantaneous_features,
     compute_skewness,

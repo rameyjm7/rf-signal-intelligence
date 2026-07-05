@@ -54,7 +54,7 @@ def _install_fake_tensorflow(monkeypatch):
 
 def test_rml2018_lstm_builder_compiles_model(monkeypatch):
     _install_fake_tensorflow(monkeypatch)
-    from ml_wireless_classification.models.rml2018_lstm import build_rml2018_lstm_model
+    from rf_signal_intelligence.models.rml2018_lstm import build_rml2018_lstm_model
 
     model = build_rml2018_lstm_model((1024, 3), 24, learning_rate=1e-4)
 
@@ -65,7 +65,7 @@ def test_rml2018_lstm_builder_compiles_model(monkeypatch):
 
 def test_deepradar_cnn_bilstm_builder_compiles_model(monkeypatch):
     _install_fake_tensorflow(monkeypatch)
-    from ml_wireless_classification.models.deepradar_cnn_bilstm import build_deepradar_cnn_bilstm
+    from rf_signal_intelligence.models.deepradar_cnn_bilstm import build_deepradar_cnn_bilstm
 
     model = build_deepradar_cnn_bilstm((1024, 3), 23)
 

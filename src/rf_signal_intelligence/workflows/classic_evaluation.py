@@ -7,17 +7,17 @@ from typing import Any
 
 import numpy as np
 
-from ml_wireless_classification.config import resolve_path
-from ml_wireless_classification.data.deepradar import load_deepradar_test_split
-from ml_wireless_classification.data.rml import (
+from rf_signal_intelligence.config import resolve_path
+from rf_signal_intelligence.data.deepradar import load_deepradar_test_split
+from rf_signal_intelligence.data.rml import (
     load_rml2016_pickle,
     load_rml2018_per_snr,
     load_rml2018_split,
     parse_classes_file,
     rml2016_arrays,
 )
-from ml_wireless_classification.evaluation import classification_metrics, write_metrics_json
-from ml_wireless_classification.plots import (
+from rf_signal_intelligence.evaluation import classification_metrics, write_metrics_json
+from rf_signal_intelligence.plots import (
     accuracy_by_snr,
     per_class_accuracy_by_snr,
     write_overall_snr_csv,

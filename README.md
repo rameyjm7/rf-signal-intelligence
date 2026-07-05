@@ -64,7 +64,7 @@ Notebook `50` now evaluates Noisy Drone RF v2 in a dedicated eval-only cell and 
 ## Repository Layout
 
 ```text
-src/ml_wireless_classification/   Python package
+src/rf_signal_intelligence/   Python package
   core/                           Maintained runtime/training components
   data/                           Dataset manifests and IQ loading helpers
   features/                       Reusable RF feature extraction
@@ -314,13 +314,13 @@ as thin wrappers around reusable Python modules.
 Legacy RML2016 entrypoint:
 
 ```bash
-python -m ml_wireless_classification --mode evaluate_only
+python -m rf_signal_intelligence --mode evaluate_only
 ```
 
 Or installed console script:
 
 ```bash
-ml-wireless-classification --mode evaluate_only
+rf-signal-intelligence --mode evaluate_only
 ```
 
 Supported modes:

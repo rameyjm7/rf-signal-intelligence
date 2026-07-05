@@ -1,15 +1,10 @@
-"""ML Wireless Signal Classification package."""
+"""Compatibility package for the renamed `rf_signal_intelligence` package."""
 
-def create_app() -> None:
-    """Compatibility shim for legacy console entry points."""
-    from ml_wireless_classification.__main__ import main as _main
-    _main()
+from __future__ import annotations
 
+import importlib
+import sys
 
-def main() -> None:
-    """CLI entry point exposed for console_scripts."""
-    from ml_wireless_classification.__main__ import main as _main
-    _main()
+_package = importlib.import_module("rf_signal_intelligence")
+sys.modules[__name__] = _package
 
-
-__all__ = ["main", "create_app"]

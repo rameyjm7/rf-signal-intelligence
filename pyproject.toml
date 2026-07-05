@@ -3,9 +3,9 @@ requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "ml_wireless_classification"
+name = "rf-signal-intelligence"
 version = "0.1.0"
-description = "ML Wireless Classification"
+description = "RF Signal Intelligence"
 readme = "README.md"
 requires-python = ">=3.10"
 license = { file = "LICENSE" }
@@ -41,9 +41,9 @@ gpu = [
 ]
 
 [project.scripts]
-start = "ml_wireless_classification:create_app"
-ml-wireless-classification = "ml_wireless_classification:main"
-rfsi = "ml_wireless_classification.cli:main"
+start = "rf_signal_intelligence:create_app"
+rf-signal-intelligence = "rf_signal_intelligence:main"
+rfsi = "rf_signal_intelligence.cli:main"
 
 [tool.setuptools]
 package-dir = { "" = "src" }
@@ -60,11 +60,11 @@ exclude = [
   "docs",
   "models",
   "notebooks",
-  "src/ml_wireless_classification/base",
-  "src/ml_wireless_classification/legacy",
-  "src/ml_wireless_classification/core/base_classifier.py",
-  "src/ml_wireless_classification/models/rnn_lstm_with_snr.py",
-  "src/ml_wireless_classification/__about__.py",
+  "src/rf_signal_intelligence/base",
+  "src/rf_signal_intelligence/legacy",
+  "src/rf_signal_intelligence/core/base_classifier.py",
+  "src/rf_signal_intelligence/models/rnn_lstm_with_snr.py",
+  "src/rf_signal_intelligence/__about__.py",
 ]
 
 [tool.ruff.lint]

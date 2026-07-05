@@ -2,19 +2,19 @@ from pathlib import Path
 
 import numpy as np
 
-from ml_wireless_classification.cli import build_parser
-from ml_wireless_classification.data.noisy_drone import (
+from rf_signal_intelligence.cli import build_parser
+from rf_signal_intelligence.data.noisy_drone import (
     build_manifest,
     coerce_iq_array,
     parse_noisy_drone_filename,
 )
-from ml_wireless_classification.features.spectrogram import (
+from rf_signal_intelligence.features.spectrogram import (
     SpectrogramConfig,
     find_burst_start,
     iq_to_full_complex_spectrogram,
 )
-from ml_wireless_classification.plots import modulation_accuracy_traces_by_snr
-from ml_wireless_classification.workflows.comparison import comparison_row
+from rf_signal_intelligence.plots import modulation_accuracy_traces_by_snr
+from rf_signal_intelligence.workflows.comparison import comparison_row
 
 
 def test_parse_noisy_drone_filename_extracts_metadata():
