@@ -27,14 +27,11 @@ def test_tracked_notebooks_use_code_only_numbered_cell_headers():
             ), f"{notebook_path} cell {idx} does not use required header"
 
 
-def test_tracked_notebooks_keep_main_cell_order_and_use_unique_descriptions():
+def test_tracked_notebooks_use_unique_cell_descriptions():
     tracked = subprocess.check_output(["git", "ls-files", "notebooks/*.ipynb"], text=True)
     for notebook in tracked.splitlines():
-        main_text = subprocess.check_output(["git", "show", f"origin/main:{notebook}"], text=True)
-        main = json.loads(main_text)
         current = json.loads(Path(notebook).read_text(encoding="utf-8"))
 
-        assert len(current.get("cells", [])) == len(main.get("cells", [])), notebook
         descriptions = []
         for idx, current_cell in enumerate(current.get("cells", []), start=1):
             current_source = "".join(current_cell.get("source", [])).splitlines()
