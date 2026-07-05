@@ -7,4 +7,3 @@ import sys
 
 _package = importlib.import_module("rf_signal_intelligence")
 sys.modules[__name__] = _package
-

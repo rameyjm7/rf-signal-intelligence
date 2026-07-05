@@ -70,11 +70,11 @@ jobs:
       - name: Pylint
         run: |
           pylint --rcfile=.pylintrc \
-            src/ml_wireless_classification/__init__.py \
-            src/ml_wireless_classification/__main__.py \
-            src/ml_wireless_classification/core/run_mode.py \
-            src/ml_wireless_classification/core/callbacks.py \
-            src/ml_wireless_classification/models/__init__.py \
+            src/rf_signal_intelligence/__init__.py \
+            src/rf_signal_intelligence/__main__.py \
+            src/rf_signal_intelligence/core/run_mode.py \
+            src/rf_signal_intelligence/core/callbacks.py \
+            src/rf_signal_intelligence/models/__init__.py \
             tests/integration_policy.py \
             tests/test_cli_defaults.py \
             tests/test_cli_imports.py \

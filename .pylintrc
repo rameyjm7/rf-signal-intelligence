@@ -1,9 +1,9 @@
 [MASTER]
 ignore-paths=
-    ^src/ml_wireless_classification/base/.*$
-    ^src/ml_wireless_classification/legacy/.*$
-    ^src/ml_wireless_classification/core/base_classifier.py$
-    ^src/ml_wireless_classification/models/rnn_lstm_with_snr.py$
+    ^src/rf_signal_intelligence/base/.*$
+    ^src/rf_signal_intelligence/legacy/.*$
+    ^src/rf_signal_intelligence/core/base_classifier.py$
+    ^src/rf_signal_intelligence/models/rnn_lstm_with_snr.py$
 
 [MESSAGES CONTROL]
 disable=
