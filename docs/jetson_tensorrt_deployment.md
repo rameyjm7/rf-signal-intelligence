@@ -153,7 +153,17 @@ Record benchmark output in this table when run on target hardware:
 | ONNX Runtime CPU | Pending target run | FP32 | 1 | Pending | Pending | Pending |
 | ONNX Runtime CUDA | Jetson | FP32 | 1 | Pending | Pending | Pending |
 | ONNX Runtime TensorRT EP | Jetson | FP16 | 1 | Pending | Pending | Pending |
-| TensorRT `trtexec` | Jetson | FP16 | 1 | Pending | Pending | Pending |
+| TensorRT `trtexec` | Jetson Orin | FP16 | 1 | 79.0 ms | 79.01 ms | 12.58 qps |
+
+Recorded TensorRT run:
+
+```text
+TensorRT: 10.3.0
+Device: Jetson Orin
+Input: 1x1024x1024x2
+Output: 1x7
+Command: sudo env DURATION=5 WARMUP=100 ITERATIONS=100 ./benchmark_engine.sh
+```
 
 ## 5. Run TensorRT Engine Inference
 
@@ -169,6 +179,20 @@ sudo ./deploy/run_tensorrt_engine_inference.sh \
 ```
 
 The output includes prediction, confidence, top classes, average latency, throughput, and TensorRT input/output tensor shapes.
+
+Validated TensorRT FP16 correctness on the Jetson with one preprocessed NoisyDroneRFv2 sample per class:
+
+| Expected | TensorRT Prediction | Confidence |
+|---|---|---:|
+| DJI | DJI | 1.000 |
+| FutabaT14 | FutabaT14 | 1.000 |
+| FutabaT7 | FutabaT7 | 1.000 |
+| Graupner | Graupner | 0.998 |
+| Noise | Noise | 0.995 |
+| Taranis | Taranis | 0.945 |
+| Turnigy | Turnigy | 1.000 |
+
+Summary: 7/7 expected classes matched using direct TensorRT engine inference.
 
 For a stronger correctness check, copy one or more preprocessed validation `.npy` files to the Jetson and run:
 

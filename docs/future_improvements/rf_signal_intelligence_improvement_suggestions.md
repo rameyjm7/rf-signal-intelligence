@@ -75,60 +75,7 @@ Minimum benchmark table:
 | TensorRT | Jetson | FP16 | 1 | TBD | TBD | TBD |
 | TensorRT | Jetson | FP16 | 8 | TBD | TBD | TBD |
 
-## 3. Finish The Jetson TensorRT Runtime Check
-
-**Goal:** Verify the exported NoisyDroneRFv2 ONNX model on the target edge runtime, not only on local ONNX Runtime CPU.
-
-The repo already has ONNX export, ONNX validation, local ONNX inference, TensorRT helper scripts, and deployment documentation. Remaining work is to run the workflow on the Jetson and record actual results.
-
-Target model:
-
-```text
-models/noisy_drone_rf_v2/noisy_drone_rf_v2_vgg_full_complex_spectrogram_best.keras
-```
-
-Current exported artifacts:
-
-```text
-models/noisy_drone_rf_v2/noisy_drone_rf_v2_vgg_full_complex_spectrogram.onnx
-models/noisy_drone_rf_v2/labels.json
-models/noisy_drone_rf_v2/sample_input.npy
-models/noisy_drone_rf_v2/run_onnx_inference.sh
-```
-
-Build a TensorRT FP16 engine on the Jetson:
-
-```bash
-/usr/src/tensorrt/bin/trtexec \
-  --onnx=models/noisy_drone_rf_v2/noisy_drone_rf_v2_vgg_full_complex_spectrogram.onnx \
-  --saveEngine=models/noisy_drone_rf_v2/noisy_drone_rf_v2_vgg_full_complex_spectrogram_fp16.engine \
-  --fp16 \
-  --verbose
-```
-
-Benchmark the TensorRT engine:
-
-```bash
-/usr/src/tensorrt/bin/trtexec \
-  --loadEngine=models/noisy_drone_rf_v2/noisy_drone_rf_v2_vgg_full_complex_spectrogram_fp16.engine \
-  --warmUp=500 \
-  --duration=30 \
-  --iterations=1000
-```
-
-Record:
-
-```text
-hardware
-JetPack / TensorRT version
-engine build command
-benchmark command
-latency
-throughput
-any unsupported ONNX ops or conversion warnings
-```
-
-## 4. Add Runtime Profiling Notes
+## 3. Add Runtime Profiling Notes
 
 **Goal:** Capture where time is spent once the edge inference path is running.
 
