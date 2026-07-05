@@ -67,6 +67,14 @@ Immediately run a local CPU classification from the exported sample:
 models/noisy_drone_rf_v2/run_onnx_inference.sh --providers CPUExecutionProvider
 ```
 
+For demos where the raw top-1 is `Noise` but you want to inspect the strongest RF class, use:
+
+```bash
+models/noisy_drone_rf_v2/run_onnx_inference.sh \
+  --providers CPUExecutionProvider \
+  --decision-mode non-noise
+```
+
 ## 2. Validate ONNX Against Keras
 
 The export command validates by default. To run validation separately:

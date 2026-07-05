@@ -407,6 +407,11 @@ rfsi export-onnx \
 
 # Run the exported ONNX model locally on CPU.
 models/noisy_drone_rf_v2/run_onnx_inference.sh --providers CPUExecutionProvider
+
+# Inspect the strongest non-Noise class when the raw model top-1 is Noise.
+models/noisy_drone_rf_v2/run_onnx_inference.sh \
+  --providers CPUExecutionProvider \
+  --decision-mode non-noise
 ```
 
 Suggested end-to-end flow:

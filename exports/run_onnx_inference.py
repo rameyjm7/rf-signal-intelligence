@@ -22,6 +22,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--providers", default="CPUExecutionProvider")
     parser.add_argument("--top-k", type=int, default=3)
     parser.add_argument("--iterations", type=int, default=1)
+    parser.add_argument(
+        "--decision-mode",
+        choices=("raw", "non-noise"),
+        default="raw",
+        help="Use raw top-1 output or promote the best non-Noise class.",
+    )
     return parser.parse_args()
 
 
@@ -50,10 +56,32 @@ def main() -> int:
     elapsed = time.perf_counter() - start
 
     probs = np.asarray(probs[0], dtype=np.float64)
-    ranking = np.argsort(probs)[::-1][: max(1, args.top_k)]
+    raw_ranking = np.argsort(probs)[::-1]
+    raw_idx = int(raw_ranking[0])
+    decision_idx = raw_idx
+    decision_detail = None
+    if args.decision_mode == "non-noise" and "Noise" in labels and len(labels) > 1:
+        masked = probs.copy()
+        masked[labels.index("Noise")] = -np.inf
+        decision_idx = int(np.argmax(masked))
+        non_noise_mass = float(np.sum(probs) - probs[labels.index("Noise")])
+        conditional_confidence = (
+            float(probs[decision_idx] / non_noise_mass)
+            if non_noise_mass > 0.0
+            else float(probs[decision_idx])
+        )
+        decision_detail = {
+            "mode": "non-noise",
+            "conditional_confidence": conditional_confidence,
+            "non_noise_probability_mass": non_noise_mass,
+        }
+    ranking = raw_ranking[: max(1, args.top_k)]
     payload = {
-        "prediction": labels[int(ranking[0])] if int(ranking[0]) < len(labels) else str(int(ranking[0])),
-        "confidence": float(probs[int(ranking[0])]),
+        "prediction": labels[decision_idx] if decision_idx < len(labels) else str(decision_idx),
+        "confidence": float(probs[decision_idx]),
+        "raw_prediction": labels[raw_idx] if raw_idx < len(labels) else str(raw_idx),
+        "raw_confidence": float(probs[raw_idx]),
+        "decision": decision_detail,
         "top": [
             {
                 "label": labels[int(idx)] if int(idx) < len(labels) else str(int(idx)),
