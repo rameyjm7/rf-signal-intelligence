@@ -8,52 +8,50 @@
 **Maintainer:** Jacob M. Ramey  
 LinkedIn: https://www.linkedin.com/in/rameyjm/
 
-GPU-ready RF/IQ machine-learning workspace for modulation recognition, radar waveform analysis, SDR-backed RF sensing, model evaluation, and reproducible deployment workflows.
+Built a real-time RF drone-classification pipeline using live SDR-to-SDR IQ replay/receive, spectrogram-based VGG inference, ONNX export, TensorRT FP16 deployment on NVIDIA Jetson, and Nsight/trtexec profiling; achieved 68/70 exact OTA class matches across seven NoisyDroneRFv2 classes.
 
-This project now spans the full RF ML path: public dataset training/evaluation, live SDR replay/receive testing, ONNX export, Jetson TensorRT deployment, and profiling.
+This repo now covers the full practical path:
+
+```text
+public RF datasets -> reusable training/evaluation code -> live SDR replay/receive -> ONNX export -> Jetson TensorRT deployment
+```
 
 ## Table of Contents
+
 - [Overview](#overview)
 - [Live OTA Noisy Drone Demo](#live-ota-noisy-drone-demo)
-- [Current Progress (July 2026)](#current-progress-july-2026)
+- [Headline Results](#headline-results)
+- [Quickstart](#quickstart)
 - [Repository Layout](#repository-layout)
-- [Datasets](#datasets)
-- [Results: RML2016](#results-rml2016)
-- [Results: RML2018](#results-rml2018)
-- [Results: DeepRadar2022](#results-deepradar2022)
-- [Results: Noisy Drone RF v2](#results-noisy-drone-rf-v2)
-- [Requirements](#requirements)
-- [Local Setup](#local-setup)
-- [CLI Usage](#cli-usage)
-- [Live RF Drone Classifier](#live-rf-drone-classifier)
+- [Datasets And Cards](#datasets-and-cards)
+- [CLI Workflows](#cli-workflows)
+- [Live RF Classifier](#live-rf-classifier)
 - [Jetson TensorRT Deployment](#jetson-tensorrt-deployment)
+- [Testing](#testing)
 - [Docker](#docker)
 - [Notes](#notes)
 - [Citation](#citation)
 
 ## Overview
 
-This repository contains training pipelines, evaluation notebooks, saved models, and documentation for deep-learning-based RF signal intelligence.
-
 Implemented workflows include:
-- LSTM and BiLSTM architectures for raw I/Q modeling
-- CNN + recurrent hybrids for time-frequency structure
-- Cross-dataset experimentation on RML2016, RML2018, and DeepRadar2022
-- Live over-the-air SDR replay/receive classification for NoisyDroneRFv2
-- ONNX export and TensorRT FP16 deployment on NVIDIA Jetson
-- GPU-ready execution via Docker/Apptainer
+
+- NoisyDroneRFv2 VGG full-complex spectrogram classification
+- Live over-the-air SDR replay/receive classification
+- RML2016, RML2018, and DeepRadar2022 training/evaluation experiments
+- Reusable Python workflows under `src/rf_signal_intelligence/`
+- Config-driven CLI entrypoints for training, evaluation, comparison, and ONNX export
+- Jetson TensorRT FP16 benchmarking and profiling support
+
+The notebooks remain available, but the project is moving toward reusable package code and reproducible CLI workflows.
 
 ## Live OTA Noisy Drone Demo
 
 The strongest current demo replays labeled NoisyDroneRFv2 IQ samples from one SDR and classifies the received live RF capture from another SDR. This checks the model through a real TX/RX hardware path, not only offline dataset inference.
 
-Pipeline:
-
 ```text
 NoisyDroneRFv2 IQ sample -> SDR TX replay -> live RF capture -> waterfall window selection -> VGG spectrogram model -> class/confidence
 ```
-
-Headline run:
 
 | Test | Result |
 |---|---:|
@@ -65,254 +63,165 @@ Headline run:
 | Sample rate | 20 MS/s |
 | Bandwidth | 20 MHz |
 
+Hardware setup:
+
+| Component | Used for |
+|---|---|
+| bladeRF | TX replay |
+| HackRF | RX capture |
+| Center frequency | 2.399 GHz |
+| Sample rate | 20 MS/s |
+| Bandwidth | 20 MHz |
+| Dataset | NoisyDroneRFv2 |
+| Model | VGG full-complex spectrogram |
+
 Representative live RX waterfall/classification overlays:
 
 | DJI live OTA classification | Taranis live OTA classification |
 |---|---|
 | ![DJI live OTA waterfall classification](results/noisy_drone_rf_v2/snr20_waterfalls/001_DJI_waterfall.png) | ![Taranis live OTA waterfall classification](results/noisy_drone_rf_v2/snr20_waterfalls/052_Taranis_waterfall.png) |
 
-Full report and artifacts:
+Full evidence:
 
-- [70-trial OTA SDR-to-SDR SNR >= 20 dB sweep report](results/noisy_drone_rf_v2/snr20_class_sweep_results.md)
-- [NoisyDroneRFv2 model card](docs/model_cards/noisy_drone_rf_v2_vgg.md)
+- [70-trial OTA SDR-to-SDR sweep report](results/noisy_drone_rf_v2/snr20_class_sweep_results.md)
+- [NoisyDroneRFv2 result card](docs/results/noisy_drone_rf_v2/README.md)
 - [Jetson TensorRT benchmark/profile summary](results/benchmarks/noisy_drone_tensorrt_jetson.md)
 
-## Current Progress (July 2026)
+## Headline Results
 
-- Live OTA NoisyDroneRFv2 SDR-to-SDR sweep reached `68/70` exact final prediction matches across seven classes.
-- NoisyDroneRFv2 was exported to ONNX, converted to TensorRT FP16, validated on Jetson with 7/7 class samples, and profiled with Nsight Systems.
-- RML2018 was rebaselined with a new continuation training run; best checkpoint evaluation reached `0.8295` accuracy on the current filtered protocol used in notebook evaluation.
-- Cross-dataset ensemble evaluation (`43`) is now aligned with pinned best-checkpoint loading and class-order calibration, producing stable combined results (recent run: `0.96` overall on the sampled combined set).
-- Notebook naming and pipeline flow were standardized:
-  - training: `30_lstm_rml2016.ipynb`, `31_lstm_rml2018.ipynb`, `32_lstm_deepradar2022.ipynb`
-  - evaluation: `40_evaluation_rml2016.ipynb`, `41_evaluation_rml2018.ipynb`, `42_evaluation_deepradar2022.ipynb`, `43_evaluation_cross_dataset_ensemble.ipynb`, `50_evaluation_comparison.ipynb`
-- Evaluation notebooks now save local artifacts under `outputs/` (confusion matrices, classification reports, SNR charts, and training-curve plots) so notebook outputs can be cleared while retaining reproducible figures/tables.
-- Artifact review notebook added: `notebooks/99_outputs_artifact_review.ipynb` for consolidating saved outputs before README/report updates.
+| Area | Model / protocol | Result |
+|---|---|---:|
+| Live OTA NoisyDroneRFv2 | SDR TX/RX, SNR >= 20 dB class sweep | 68/70 exact matches |
+| NoisyDroneRFv2 offline | VGG full-complex spectrogram, natural held-out test | 0.9769 accuracy |
+| NoisyDroneRFv2 offline | VGG full-complex spectrogram, balanced held-out test | 0.9803 accuracy |
+| Jetson TensorRT | FP16 engine benchmark | 79.0 ms mean latency |
+| Jetson TensorRT | Direct per-class validation | 7/7 classes matched |
+| RML2016 | CNN-transformer, all SNR levels | 0.6645 accuracy |
+| RML2016 | CNN-transformer, SNR > -2 dB | 0.8969 accuracy |
+| RML2018 | LSTM continued checkpoint, current notebook protocol | 0.8295 accuracy |
 
-### Latest Notebook 50 Run (Local)
+Detailed offline result history, older plots, and protocol notes live in [docs/results/offline_model_results.md](docs/results/offline_model_results.md). Dataset/model caveats are documented in the cards under `docs/`.
 
-| Dataset | Model | Eval protocol | Accuracy | Macro F1 | Weighted F1 | Samples |
-|---|---|---|---:|---:|---:|---:|
-| Noisy Drone RF v2 | VGG full-complex spectrogram | Natural held-out test | 0.9769 | 0.9775 | 0.9767 | 649 |
-| Noisy Drone RF v2 | VGG full-complex spectrogram | Balanced held-out test | 0.9803 | 0.9807 | 0.9807 | 203 |
-| RML2016 | CNN-transformer | All SNR levels | 0.6645 | 0.6592 | 0.6592 | 44,000 |
-| RML2016 | CNN-transformer | SNR > -2 dB | 0.8969 | 0.8900 | 0.8913 | n/a |
-| RML2018 | LSTM continued checkpoint | All test | 0.8295 | n/a | n/a | n/a |
-| DeepRadar2022 | CNN-transformer continued stage 2 | All test | 0.4461 | 0.3973 | 0.3973 | n/a |
+## Quickstart
 
-Notebook `50` now evaluates Noisy Drone RF v2 in a dedicated eval-only cell and writes consolidated comparison artifacts under `outputs/50_evaluation_comparison/`.
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+pip install -e ".[dev,test]"
+```
+
+For NoisyDroneRFv2 `.pt` files:
+
+```bash
+pip install -e ".[noisy-drone]"
+```
+
+For GPU-focused environments:
+
+```bash
+pip install -e ".[gpu]"
+```
 
 ## Repository Layout
 
 ```text
-src/rf_signal_intelligence/   Python package
+src/rf_signal_intelligence/       Reusable Python package
   core/                           Maintained runtime/training components
   data/                           Dataset manifests and IQ loading helpers
-  features/                       Reusable RF feature extraction
-  workflows/                      Config-driven training/evaluation/export workflows
+  features/                       RF feature extraction
+  workflows/                      Config-driven train/evaluate/export workflows
   models/                         Maintained model definitions
-  legacy/                         Compatibility shims for older experiments
-  base/                           Backward-compatible import wrappers
-configs/                          Dataset and model registries (YAML)
-data/                             Datasets (RML2016, RML2018, DeepRadar2022)
+configs/                          Dataset and model workflow configs
+exports/                          ONNX validation and inference helpers
+deploy/                           Jetson/TensorRT scripts
 models/                           Saved model artifacts
-outputs/                          Generated runtime outputs (stats, logs, new artifacts)
-notebooks/                        Reproducible notebooks
-docker/                           Docker and Apptainer build/runtime files
-docs/                             Project reports and papers
-tests/                            Test and integration checks
+outputs/                          Generated local outputs
+results/                          Curated result reports and figures
+notebooks/                        Reproducible notebook frontends
+docs/                             Model cards, dataset cards, reports, protocols
+tests/                            Unit and integration tests
 ```
 
-Archived experiments and prototype notebooks were moved out of this working branch and are
-preserved on the `archive/legacy-notebooks` branch.
+Archived experiments and prototype notebooks are preserved on the `archive/legacy-notebooks` branch.
 
-## Datasets
+## Datasets And Cards
 
-### RML2016.10A
-11 modulation types, SNR from -20 dB to +18 dB.
-
-### RML2018.01A
-24 classes; used for larger-scale training/evaluation and cross-dataset checks.
-
-### DeepRadar2022
-Radar waveform dataset used for CNN-BiLSTM style modeling and transfer evaluation.
-
-Detailed dataset cards are available under [`docs/dataset_cards/`](docs/dataset_cards/):
+Dataset cards:
 
 - [Noisy Drone RF v2](docs/dataset_cards/noisy_drone_rf_v2.md)
 - [RML2016.10A](docs/dataset_cards/rml2016.md)
 - [RML2018.01A](docs/dataset_cards/rml2018.md)
 - [DeepRadar2022](docs/dataset_cards/deepradar2022.md)
 
-Model cards are available under [`docs/model_cards/`](docs/model_cards/):
+Model cards:
 
 - [NoisyDroneRFv2 VGG](docs/model_cards/noisy_drone_rf_v2_vgg.md)
 - [RML2016 CNN-transformer](docs/model_cards/rml2016_cnn_transformer.md)
 - [RML2018 LSTM](docs/model_cards/rml2018_lstm.md)
 - [DeepRadar2022 CNN-transformer](docs/model_cards/deepradar2022_cnn_transformer.md)
 
-NVIDIA edge deployment path:
+Evaluation and deployment references:
 
+- [Evaluation protocols](docs/evaluation_protocols.md)
+- [Detailed offline results](docs/results/offline_model_results.md)
 - [Jetson TensorRT deployment guide](docs/jetson_tensorrt_deployment.md)
 
-## Results: RML2016
+## CLI Workflows
 
-### Summary
-- Accuracy (all SNR): 67.0%
-- Accuracy (SNR > 5 dB): 94%
-- Macro F1: 0.68
-- Weighted F1: 0.68
+The preferred workflow is the `rfsi` CLI plus notebooks that call reusable code under `src/`.
 
-### Current Local Snapshot (Notebook 50)
+```bash
+# Train or continue the canonical NoisyDroneRFv2 VGG spectrogram model.
+rfsi train --config configs/noisy_drone_vgg.yaml
 
-| Split | Accuracy | Macro F1 | Weighted F1 | Samples |
-|---|---:|---:|---:|---:|
-| All SNR levels | 0.67 | 0.69 | 0.69 | 44,000 |
-| SNR > 5 dB | 0.93 | 0.92 | 0.92 | 15,332 |
+# Evaluate the canonical NoisyDroneRFv2 VGG spectrogram model.
+rfsi evaluate \
+  --config configs/noisy_drone_vgg.yaml \
+  --checkpoint models/noisy_drone_rf_v2/noisy_drone_rf_v2_vgg_full_complex_spectrogram_best.keras
 
-### Confusion Matrix
-![RML2016 Confusion Matrix](https://github.com/user-attachments/assets/6eebbb20-105d-4c9c-ba17-7f2ec11e070f)
+# Rebuild cross-dataset comparison artifacts.
+rfsi compare --config configs/evaluation_comparison.yaml
 
-## Results: RML2018
-
-### Overall Accuracy
-Legacy baseline (full-distribution run): approx. 72% across 72,000 evaluation samples.
-
-### Results Figure 1
-![RML2018 Image 1](https://github.com/user-attachments/assets/e23bbd81-9f4f-4d7a-9bd4-11e0a3625044)
-
-### Classification Report (All SNRs)
-
-```text
-precision    recall  f1-score   support
-
-128APSK 0.36 0.16 0.23 3000
-128QAM  0.42 0.49 0.45 3000
-16APSK  0.91 0.90 0.90 3000
-16PSK   0.86 0.76 0.81 3000
-16QAM   0.75 0.92 0.83 3000
-256QAM  0.92 0.74 0.82 3000
-32APSK  0.87 0.80 0.83 3000
-32PSK   0.98 0.97 0.98 3000
-32QAM   0.91 0.90 0.90 3000
-4ASK    0.63 0.56 0.60 3000
-64APSK  0.45 0.69 0.54 3000
-64QAM   0.60 0.84 0.70 3000
-8ASK    0.46 0.83 0.60 3000
-8PSK    0.63 0.90 0.74 3000
-AM-DSB-SC 0.39 0.15 0.22 3000
-AM-DSB-WC 1.00 1.00 1.00 3000
-AM-SSB-SC 0.66 0.60 0.63 3000
-AM-SSB-WC 0.71 0.45 0.55 3000
-BPSK    0.78 0.85 0.81 3000
-FM      0.94 0.98 0.96 3000
-GMSK    0.88 0.87 0.87 3000
-OOK     0.84 0.96 0.90 3000
-OQPSK   0.29 0.04 0.06 3000
-QPSK    0.78 0.94 0.85 3000
-
-accuracy 0.72 72000
+# Export the NoisyDroneRFv2 model and supporting ONNX artifacts.
+rfsi export-onnx \
+  --config configs/noisy_drone_vgg.yaml \
+  --out models/noisy_drone_rf_v2/noisy_drone_rf_v2_vgg_full_complex_spectrogram.onnx \
+  --sample-out models/noisy_drone_rf_v2/sample_input.npy \
+  --labels-out models/noisy_drone_rf_v2/labels.json
 ```
 
-### Additional RML2018 Figures
+Run the exported ONNX model locally on CPU:
 
-![RML2018 Image 2](https://github.com/user-attachments/assets/99d3b667-93d4-430e-abf3-aa6b4c743a31)
-![RML2018 Image 3](https://github.com/user-attachments/assets/5e8d2c18-5c62-489e-84ea-8b2648eca610)
+```bash
+models/noisy_drone_rf_v2/run_onnx_inference.sh --providers CPUExecutionProvider
+```
 
-### Current Local Snapshot (Notebook 50)
+Run one high-SNR dataset sample per class:
 
-| Eval Protocol | Accuracy | Macro F1 | Weighted F1 | Samples |
-|---|---:|---:|---:|---:|
-| Highest-SNR class-balanced slice with class-order calibration | 0.9465 | 0.94 | 0.94 | 4,800 |
+```bash
+models/noisy_drone_rf_v2/run_onnx_inference.sh \
+  --class-sweep \
+  --dataset-dir /data/rameyjm7/datasets/NoisyDroneRFv2 \
+  --min-snr 20 \
+  --samples-per-class 1 \
+  --format table \
+  --providers CPUExecutionProvider
+```
 
-Notes:
-- Mapping calibration in notebook `50` selected `LabelEncoder` order (`acc_orig=0.0192`, `acc_fixed=0.0994`, `acc_le=0.9465`).
-- This snapshot is not directly comparable to full-distribution all-SNR evaluations.
+Legacy RML2016 entrypoint:
 
-## Results: DeepRadar2022
+```bash
+rf-signal-intelligence --mode evaluate_only
+```
 
-### CNN-BiLSTM Hybrid Evaluation
-
-![DeepRadar Image 1](https://github.com/user-attachments/assets/a2e6d2dc-ef18-4bdd-a8c8-31d2bbb77a0f)
-![DeepRadar Image 2](https://github.com/user-attachments/assets/68843377-7fc4-45ba-9f16-9a40b9ecc2c9)
-![DeepRadar Image 3](https://github.com/user-attachments/assets/0754f4da-e8d6-4cd0-9627-056e932a2865)
-![DeepRadar Image 4](https://github.com/user-attachments/assets/c9eb6c5b-737f-4273-ba68-0ac3d13e3aab)
-
-### Current Local Snapshot (Notebook 50)
-
-| Split | Accuracy | Macro F1 | Weighted F1 | Samples |
-|---|---:|---:|---:|---:|
-| All SNR levels | 0.8433 | 0.84 | 0.84 | 156,400 |
-
-## Results: Cross-Dataset Ensemble
-
-<img width="2184" height="1990" alt="image" src="https://github.com/user-attachments/assets/371e4354-fa85-4b50-9143-50fbcbdb7927" />
-
-## Results: Noisy Drone RF v2
-
-The current canonical Noisy Drone RF v2 model is the VGG full-complex spectrogram model saved at:
-
-`models/noisy_drone_rf_v2/noisy_drone_rf_v2_vgg_full_complex_spectrogram_best.keras`
-
-Notebook flow:
-- `33_vgg_spectrogram_noisy_drone_rf_v2.ipynb`: training/evaluation experiment and baseline saved artifacts.
-- `44_evaluation_noisy_drone_rf_v2.ipynb`: eval-only notebook for the canonical VGG model.
-- `50_evaluation_comparison.ipynb`: final comparison, with a dedicated Noisy Drone RF v2 eval-only cell.
-
-Current metrics from notebooks `33`, `44`, and `50` agree on the same held-out split configuration (`NOISY_DRONE_MIN_SNR_DB=-6`, `NOISY_DRONE_DATA_FRACTION=0.25`, one eval window).
-
-| Source | Eval protocol | Accuracy | Macro F1 | Weighted F1 | Samples |
-|---|---|---:|---:|---:|---:|
-| `33` | Balanced held-out test | 0.9803 | 0.9807 | 0.9807 | 203 |
-| `44` | Natural held-out test | 0.9769 | 0.9775 | 0.9767 | 649 |
-| `44` | Balanced held-out test | 0.9803 | 0.9807 | 0.9807 | 203 |
-| `50` | Natural held-out test | 0.9769 | 0.9775 | 0.9767 | 649 |
-| `50` | Balanced held-out test | 0.9803 | 0.9807 | 0.9807 | 203 |
-
-Saved result artifacts:
-- [Live OTA SDR-to-SDR class sweep report](results/noisy_drone_rf_v2/class_sweep_results.md)
-- [70-trial OTA SDR-to-SDR SNR >= 20 dB sweep report](results/noisy_drone_rf_v2/snr20_class_sweep_results.md)
-- [33 balanced confusion matrix](outputs/noisy_drone_rf_v2_eval/33_noisy_drone_rf_v2_vgg_full_complex_spectrogram_balanced_confusion_matrix.png)
-- [44 balanced confusion matrix](outputs/noisy_drone_rf_v2_eval/44_noisy_drone_rf_v2_vgg_full_complex_spectrogram_balanced_confusion_matrix.png)
-- [44 accuracy vs. SNR](outputs/noisy_drone_rf_v2_eval/44_noisy_drone_rf_v2_vgg_full_complex_accuracy_vs_snr.png)
-- [44 per-class accuracy vs. SNR](outputs/noisy_drone_rf_v2_eval/44_noisy_drone_rf_v2_vgg_full_complex_accuracy_vs_snr_per_class.png)
-- [50 cross-dataset comparison](outputs/50_evaluation_comparison/50_cross_dataset_model_comparison.csv)
-
-Existing result snapshots are retained below for continuity.
-
-<img width="1093" height="989" alt="image" src="https://github.com/user-attachments/assets/b38df917-d669-472b-bdbb-6c0df3673898" />
-
-<img width="989" height="590" alt="image" src="https://github.com/user-attachments/assets/ce206ad4-3df6-4a9c-8665-674df6181c6f" />
-
-### VGG Full-Complex Spectrogram Balanced Report
-
-**Accuracy:** 0.9803
-
-| Class | Precision | Recall | F1-score | Support |
-|---|---:|---:|---:|---:|
-| DJI | 1.00 | 0.93 | 0.96 | 29 |
-| FutabaT14 | 1.00 | 0.97 | 0.98 | 29 |
-| FutabaT7 | 1.00 | 1.00 | 1.00 | 29 |
-| Graupner | 1.00 | 1.00 | 1.00 | 29 |
-| Noise | 0.88 | 1.00 | 0.94 | 29 |
-| Taranis | 1.00 | 0.97 | 0.98 | 29 |
-| Turnigy | 1.00 | 1.00 | 1.00 | 29 |
-| **Accuracy** |  |  | **0.98** | **203** |
-| **Macro avg** | **0.98** | **0.98** | **0.98** | **203** |
-| **Weighted avg** | **0.98** | **0.98** | **0.98** | **203** |
-
-
-## Live RF Drone Classifier
+## Live RF Classifier
 
 Run the NoisyDroneRFv2 model against IQ playback, live SDR receive, or SDR-to-SDR over-the-air replay.
-
-Pipeline:
 
 ```text
 IQ source -> windowing -> preprocessing/spectrogram -> model inference -> class/confidence -> latency/throughput reporting
 ```
-
-The live script accepts `.npy`, `.npz`, `.pt`, and raw complex64 `.bin` / `.c64` IQ files for playback. It also supports SoapySDR receive and an optional TX path for replaying labeled NoisyDroneRFv2 samples from one SDR into another.
 
 IQ file playback:
 
@@ -359,7 +268,7 @@ python scripts/live_noisy_drone_rf_classifier.py \
   --save-rx-iq outputs/rx_debug.npy
 ```
 
-Reproduce the documented OTA class-sweep report:
+Reproduce the documented OTA class sweep:
 
 ```bash
 python scripts/live_noisy_drone_rf_classifier.py \
@@ -373,148 +282,6 @@ python scripts/live_noisy_drone_rf_classifier.py \
   --tx-test-save-plots-dir results/noisy_drone_rf_v2/snr20_waterfalls
 ```
 
-Suggested resume bullet:
-
-```text
-Built a live RF drone-classification pipeline with IQ playback/receive, windowed preprocessing, spectrogram-based deep-learning inference, confidence reporting, and latency instrumentation for real-time RF sensor-processing workflows.
-```
-
-
-## Requirements
-
-- Python 3.10+
-- `pip`
-- Optional: NVIDIA GPU stack for accelerated TensorFlow runs
-
-## Local Setup
-
-```bash
-python3 -m venv .venv
-source .venv/bin/activate
-python -m pip install --upgrade pip
-pip install -e .
-```
-
-For contributor tooling (lint, tests, hooks):
-
-```bash
-pip install -e ".[dev,test]"
-pre-commit install
-```
-
-For NoisyDroneRFv2 `.pt` dataset evaluation:
-
-```bash
-pip install -e ".[noisy-drone]"
-```
-
-For GPU-focused environments (Linux):
-
-```bash
-pip install -e ".[gpu]"
-```
-
-## Data
-
-By default, the CLI searches for:
-- `data/RML2016/RML2016.10a_dict.pkl`
-- `RML2016.10a_dict.pkl` (repository root)
-
-If your dataset is elsewhere, pass `--data-path`.
-
-## CLI Usage
-
-The preferred reproducible workflow is moving from notebook-only execution to the
-`rfsi` CLI plus small notebooks that call reusable code under `src/`.
-
-```bash
-# Train or continue the canonical NoisyDroneRFv2 VGG spectrogram model.
-rfsi train --config configs/noisy_drone_vgg.yaml
-
-# Evaluate the canonical NoisyDroneRFv2 VGG spectrogram model.
-rfsi evaluate \
-  --config configs/noisy_drone_vgg.yaml \
-  --checkpoint models/noisy_drone_rf_v2/noisy_drone_rf_v2_vgg_full_complex_spectrogram_best.keras
-
-# Rebuild the cross-dataset comparison artifacts.
-rfsi compare --config configs/evaluation_comparison.yaml
-
-# Export the NoisyDroneRFv2 model for deployment work.
-rfsi export-onnx \
-  --config configs/noisy_drone_vgg.yaml \
-  --out models/noisy_drone_rf_v2/noisy_drone_rf_v2_vgg_full_complex_spectrogram.onnx \
-  --sample-out models/noisy_drone_rf_v2/sample_input.npy \
-  --labels-out models/noisy_drone_rf_v2/labels.json
-
-# Run the exported ONNX model locally on CPU.
-models/noisy_drone_rf_v2/run_onnx_inference.sh --providers CPUExecutionProvider
-
-# Inspect the strongest non-Noise class when the raw model top-1 is Noise.
-models/noisy_drone_rf_v2/run_onnx_inference.sh \
-  --providers CPUExecutionProvider \
-  --decision-mode non-noise
-
-# Scan a raw IQ capture, score burst windows by the target class, and classify the best window.
-models/noisy_drone_rf_v2/run_onnx_inference.sh \
-  --iq-file outputs/rx_debug.npy \
-  --target-class FutabaT14 \
-  --window-score-mode target \
-  --decision-mode non-noise \
-  --providers CPUExecutionProvider
-
-# Run one high-SNR dataset sample per class and print a readable table.
-models/noisy_drone_rf_v2/run_onnx_inference.sh \
-  --class-sweep \
-  --dataset-dir /data/rameyjm7/datasets/NoisyDroneRFv2 \
-  --min-snr 20 \
-  --samples-per-class 1 \
-  --max-predictions 8 \
-  --format table \
-  --providers CPUExecutionProvider
-```
-
-Suggested end-to-end flow:
-
-1. Install the package.
-2. Download datasets or point `configs/local_data_paths.yaml` / workflow configs at local data.
-3. Train or evaluate with `rfsi`.
-4. Export artifacts and comparison tables.
-5. Reproduce the headline metrics table.
-6. Run the live SDR classifier.
-7. Deploy the exported ONNX model through TensorRT / Jetson.
-
-Older notebooks are retained, but the largest NoisyDroneRFv2 and comparison notebooks now act
-as thin wrappers around reusable Python modules.
-
-Legacy RML2016 entrypoint:
-
-```bash
-python -m rf_signal_intelligence --mode evaluate_only
-```
-
-Or installed console script:
-
-```bash
-rf-signal-intelligence --mode evaluate_only
-```
-
-Supported modes:
-- `train`
-- `train_continuously`
-- `evaluate_only` (default)
-
-Useful flags:
-- `--data-path <path-to-RML2016.10a_dict.pkl>`
-- `--model-name <artifact-prefix>`
-- `--models-dir <output-dir>`
-- `--stats-dir <output-dir>`
-- `--outputs-dir <output-root>`
-
-Defaults:
-- Stats/logs are written under `outputs/`.
-- If `models/<model-name>.keras` already exists, CLI will use it by default for compatibility.
-- Otherwise, model artifacts default to `outputs/models/`.
-
 ## Jetson TensorRT Deployment
 
 The NoisyDroneRFv2 model has a documented edge-inference path:
@@ -522,8 +289,6 @@ The NoisyDroneRFv2 model has a documented edge-inference path:
 ```text
 Keras model -> ONNX export -> TensorRT FP16 engine -> Jetson inference -> trtexec benchmark -> Nsight Systems profile
 ```
-
-Current Jetson validation:
 
 | Check | Result |
 |---|---:|
@@ -546,24 +311,10 @@ ruff check src tests
 pytest -q -m "not integration"
 ```
 
-Full reproducibility command:
+Full local check:
 
 ```bash
 ruff check src tests && pytest -q -m "not integration" && pytest -q -m integration -rs
-```
-
-Integration checks (local datasets/models required):
-
-```bash
-pytest -q -m integration
-```
-
-CI integration artifact policy:
-- Default policy is `skip_if_missing` (integration tests skip if artifacts are unavailable).
-- To enforce artifacts and fail instead of skip, set:
-
-```bash
-export INTEGRATION_ARTIFACT_POLICY=require
 ```
 
 Registry-driven smoke evaluation:
@@ -571,12 +322,6 @@ Registry-driven smoke evaluation:
 ```bash
 python scripts/smoke_eval_registry.py
 python scripts/smoke_eval_registry.py --with-data --require-artifacts
-```
-
-To populate checksum values in registries from local artifacts:
-
-```bash
-python scripts/update_registry_checksums.py
 ```
 
 ## Docker
@@ -588,16 +333,16 @@ make build
 make run
 ```
 
-See [`docker/README.md`](docker/README.md) for Docker Hub and Apptainer/HPC usage.
+See [docker/README.md](docker/README.md) for Docker Hub and Apptainer/HPC usage.
 
 ## Notes
 
 - Large datasets and model artifacts are expected; this repository is data-heavy.
-- Working notebooks can produce uncommitted changes during experimentation.
+- Public dataset results are not equivalent to live field collection.
 - Release/tag process is documented in `RELEASE.md`.
 
 ## Citation
 
-Ramey, J. M., and Goda, P. (2025). Wireless Signal Classification via Deep Learning.
-Maintained by Jacob M. Ramey.
+Ramey, J. M., and Goda, P. (2025). Wireless Signal Classification via Deep Learning.  
+Maintained by Jacob M. Ramey.  
 GitHub: https://github.com/rameyjm7/rf-signal-intelligence
