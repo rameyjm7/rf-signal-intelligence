@@ -412,6 +412,14 @@ models/noisy_drone_rf_v2/run_onnx_inference.sh --providers CPUExecutionProvider
 models/noisy_drone_rf_v2/run_onnx_inference.sh \
   --providers CPUExecutionProvider \
   --decision-mode non-noise
+
+# Scan a raw IQ capture, score burst windows by the target class, and classify the best window.
+models/noisy_drone_rf_v2/run_onnx_inference.sh \
+  --iq-file outputs/rx_debug.npy \
+  --target-class FutabaT14 \
+  --window-score-mode target \
+  --decision-mode non-noise \
+  --providers CPUExecutionProvider
 ```
 
 Suggested end-to-end flow:

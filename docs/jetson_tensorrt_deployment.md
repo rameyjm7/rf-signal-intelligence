@@ -75,6 +75,17 @@ models/noisy_drone_rf_v2/run_onnx_inference.sh \
   --decision-mode non-noise
 ```
 
+To classify raw IQ instead of an already prepared spectrogram tensor, pass `--iq-file`. The script will scan candidate model windows across the capture, preprocess each candidate into a full-complex spectrogram, and select the best window by target-class or non-noise confidence:
+
+```bash
+models/noisy_drone_rf_v2/run_onnx_inference.sh \
+  --iq-file outputs/rx_debug.npy \
+  --target-class FutabaT14 \
+  --window-score-mode target \
+  --decision-mode non-noise \
+  --providers CPUExecutionProvider
+```
+
 ## 2. Validate ONNX Against Keras
 
 The export command validates by default. To run validation separately:

@@ -46,5 +46,15 @@ def test_export_scripts_expose_expected_flags():
 def test_local_onnx_inference_script_exposes_expected_flags():
     text = (REPO_ROOT / "exports/run_onnx_inference.py").read_text(encoding="utf-8")
 
-    for flag in ["--onnx", "--input", "--labels", "--providers", "--top-k", "--decision-mode"]:
+    for flag in [
+        "--onnx",
+        "--input",
+        "--iq-file",
+        "--labels",
+        "--providers",
+        "--top-k",
+        "--decision-mode",
+        "--target-class",
+        "--window-score-mode",
+    ]:
         assert flag in text
