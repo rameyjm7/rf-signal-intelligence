@@ -155,9 +155,47 @@ Record benchmark output in this table when run on target hardware:
 | ONNX Runtime TensorRT EP | Jetson | FP16 | 1 | Pending | Pending | Pending |
 | TensorRT `trtexec` | Jetson | FP16 | 1 | Pending | Pending | Pending |
 
-## 5. Run Jetson Inference
+## 5. Run TensorRT Engine Inference
 
-The Python runner uses ONNX Runtime provider priority:
+Use the direct TensorRT runner to verify that the built engine produces decoded class predictions, not just benchmark timings:
+
+```bash
+sudo ./deploy/run_tensorrt_engine_inference.sh \
+  --engine models/noisy_drone_rf_v2/noisy_drone_rf_v2_vgg_full_complex_spectrogram_fp16.engine \
+  --sample models/noisy_drone_rf_v2/sample_input.npy \
+  --labels models/noisy_drone_rf_v2/labels.json \
+  --iterations 10 \
+  --format table
+```
+
+The output includes prediction, confidence, top classes, average latency, throughput, and TensorRT input/output tensor shapes.
+
+For a stronger correctness check, copy one or more preprocessed validation `.npy` files to the Jetson and run:
+
+```bash
+for cls in DJI FutabaT14 FutabaT7 Graupner Noise Taranis Turnigy; do
+  echo "=== ${cls} ==="
+  sudo ./deploy/run_tensorrt_engine_inference.sh \
+    --sample "validation_samples/${cls}.npy" \
+    --iterations 1 \
+    --format table
+done
+```
+
+If the NoisyDroneRFv2 `.pt` dataset and compatible PyTorch install are both available on the Jetson, the same runner can classify raw IQ samples or run a small class sweep:
+
+```bash
+sudo ./deploy/run_tensorrt_engine_inference.sh \
+  --class-sweep \
+  --dataset-dir /data/rameyjm7/datasets/NoisyDroneRFv2 \
+  --samples-per-class 1 \
+  --min-snr 20 \
+  --format table
+```
+
+## 6. Optional ONNX Runtime Provider Inference
+
+The ONNX Runtime runner uses provider priority:
 
 ```bash
 python deploy/run_jetson_inference.py \
@@ -168,9 +206,9 @@ python deploy/run_jetson_inference.py \
   --iterations 100
 ```
 
-The output includes prediction, confidence, selected providers, average latency, and throughput.
+This is useful when ONNX Runtime CUDA or TensorRT execution providers are installed. The direct TensorRT engine runner above is the primary Jetson correctness path.
 
-## 6. Profile With Nsight Systems
+## 7. Profile With Nsight Systems
 
 ```bash
 bash deploy/nsight_profile.sh \

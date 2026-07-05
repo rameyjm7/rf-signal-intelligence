@@ -1,54 +1,12 @@
-# RF Signal Intelligence Repo Improvement Suggestions
+# RF Signal Intelligence Future Improvements
 
-Repository: `rf-signal-intelligence`  
-Focus: Make the project stronger for NVIDIA, Jetson, TensorRT, Holoscan-adjacent sensor processing, and embedded AI roles.
+Repository: `rf-signal-intelligence`
 
-## 1. Add an ONNX → TensorRT → Jetson Deployment Path
+This document tracks remaining improvements that have not yet been fully implemented. Completed items have been removed so this stays useful as a working roadmap.
 
-**Goal:** Turn the repo from an RFML training/evaluation project into a deployable NVIDIA edge-inference project.
+## 1. Document Evaluation Protocols
 
-Add a clean export and deployment path:
-
-```text
-exports/
-  export_noisy_drone_to_onnx.py
-  validate_onnx.py
-
-deploy/
-  build_tensorrt_engine.sh
-  run_trtexec_benchmark.sh
-  run_jetson_inference.py
-  nsight_profile.sh
-
-docs/
-  jetson_tensorrt_deployment.md
-```
-
-Recommended target model: the best Noisy Drone RF classifier, because it has the strongest, cleanest headline result and is easiest to explain.
-
-Suggested pipeline:
-
-```text
-Keras/PyTorch model
-  -> ONNX export
-  -> ONNX validation
-  -> TensorRT FP16 engine
-  -> Jetson inference
-  -> trtexec benchmark
-  -> Nsight Systems profile
-```
-
-Expected resume value:
-
-```text
-Exported RF/IQ deep-learning model to ONNX, converted it to TensorRT FP16 on NVIDIA Jetson, and benchmarked/profiled latency, throughput, and CPU/GPU bottlenecks with trtexec and Nsight Systems.
-```
-
----
-
-## 2. Make Evaluation Protocols Cleaner and Easier to Trust
-
-**Goal:** Prevent reviewers from seeing the reported metrics as apples-to-oranges or cherry-picked.
+**Goal:** Make reported metrics easier to interpret and reduce ambiguity around which results are directly comparable.
 
 Create:
 
@@ -81,147 +39,155 @@ metric
 whether comparable to other rows
 ```
 
-This makes the repo look more rigorous and reduces ambiguity around why some scores are higher than others.
+## 2. Add Reproducible Benchmark Tables
 
----
+**Goal:** Make performance claims easy to rerun and compare across machines.
 
-## 3. Convert the Best Notebooks into Reproducible CLI Workflows
-
-**Goal:** Make the repo feel like a maintained ML engineering project instead of a notebook-driven research workspace.
-
-Add or standardize commands like:
-
-```bash
-rfsi train --config configs/noisy_drone_vgg.yaml
-rfsi evaluate --config configs/noisy_drone_vgg.yaml --checkpoint models/...best.keras
-rfsi compare --config configs/evaluation_comparison.yaml
-rfsi export-onnx --config configs/noisy_drone_vgg.yaml
-```
-
-Suggested README flow:
+Add a small benchmark report that captures:
 
 ```text
-1. Install
-2. Download or point to dataset
-3. Train or evaluate
-4. Export artifacts
-5. Reproduce headline table
-6. Run live classifier
-7. Deploy to TensorRT / Jetson
-```
-
-This makes the project easier for recruiters, hiring managers, and engineers to run without opening notebooks.
-
----
-
-## 4. Promote the Live RF Classifier as a First-Class Demo
-
-**Goal:** Since `scripts/live_noisy_drone_rf_classifier.py` already supports live playback/receive, make it obvious and reproducible from the top-level README.
-
-Add a README section:
-
-```markdown
-## Live RF Drone Classifier
-
-Run a live noisy-drone RF classifier using IQ playback or live SDR receive.
-
-Pipeline:
-IQ source -> windowing -> preprocessing/spectrogram -> model inference -> class/confidence -> latency/throughput reporting
-```
-
-Add example commands using the actual arguments from the script, for example:
-
-```bash
-python scripts/live_noisy_drone_rf_classifier.py \
-  --source playback \
-  --input data/sample_iq.pt \
-  --model models/noisy_drone_rf_v2/best.keras \
-  --window-size 1024 \
-  --hop-size 512
-```
-
-If live SDR receive is supported, also include:
-
-```bash
-python scripts/live_noisy_drone_rf_classifier.py \
-  --source sdr \
-  --sample-rate 20e6 \
-  --center-freq 2.437e9 \
-  --model models/noisy_drone_rf_v2/best.keras
-```
-
-Suggested resume bullet:
-
-```text
-Built a live RF drone-classification pipeline with IQ playback/receive, windowed preprocessing, spectrogram-based deep-learning inference, confidence reporting, and latency instrumentation for real-time RF sensor-processing workflows.
-```
-
----
-
-## 5. Add Model Cards and Dataset Cards
-
-**Goal:** Make the repo more credible, especially for reviewers who want to understand what the model detects, how it was trained, and where it can fail.
-
-Add:
-
-```text
-docs/model_cards/
-  noisy_drone_rf_v2_vgg.md
-  rml2016_cnn_transformer.md
-  rml2018_lstm.md
-  deepradar2022_cnn_transformer.md
-
-docs/dataset_cards/
-  noisy_drone_rf_v2.md
-  rml2016.md
-  rml2018.md
-  deepradar2022.md
-```
-
-Each model card should include:
-
-```text
-intended use
+model
+runtime
+hardware
+batch size
 input shape
-preprocessing
-classes
-training split
-evaluation protocol
-headline metrics
-known limitations
-latency target
-export/deployment status
+precision
+mean latency
+p95 latency
+throughput
+command used
+date run
 ```
 
-Each dataset card should include:
+Useful outputs:
 
 ```text
-source
-class list
-SNR range
-sample count
-preprocessing assumptions
-license / usage limitations
-leakage risks
-recommended evaluation split
+results/benchmarks/noisy_drone_onnx_cpu.md
+results/benchmarks/noisy_drone_tensorrt_jetson.md
 ```
 
-This makes the repo look more mature and helps prevent confusion around datasets, splits, and reported metrics.
+Minimum benchmark table:
 
----
+| Runtime | Platform | Precision | Batch | Avg Latency | P95 Latency | Throughput |
+|---|---|---|---:|---:|---:|---:|
+| ONNX Runtime CPU | x86 or Jetson | FP32 | 1 | TBD | TBD | TBD |
+| ONNX Runtime CUDA | Jetson | FP32 | 1 | TBD | TBD | TBD |
+| TensorRT | Jetson | FP16 | 1 | TBD | TBD | TBD |
+| TensorRT | Jetson | FP16 | 8 | TBD | TBD | TBD |
 
-# Priority Order
+## 3. Finish The Jetson TensorRT Runtime Check
 
-Recommended order for maximum NVIDIA-facing value:
+**Goal:** Verify the exported NoisyDroneRFv2 ONNX model on the target edge runtime, not only on local ONNX Runtime CPU.
 
-1. **Promote and benchmark the live RF classifier**
-2. **Add ONNX → TensorRT → Jetson deployment**
-3. **Add evaluation protocol documentation**
-4. **Convert key notebooks into CLI workflows**
-5. **Add model and dataset cards**
+The repo already has ONNX export, ONNX validation, local ONNX inference, TensorRT helper scripts, and deployment documentation. Remaining work is to run the workflow on the Jetson and record actual results.
 
-The strongest final story is:
+Target model:
 
 ```text
-RF Signal Intelligence provides a reproducible RFML pipeline from dataset training and evaluation through live IQ playback/receive, real-time drone classification, ONNX export, TensorRT deployment on NVIDIA Jetson, and Nsight-based performance profiling.
+models/noisy_drone_rf_v2/noisy_drone_rf_v2_vgg_full_complex_spectrogram_best.keras
 ```
+
+Current exported artifacts:
+
+```text
+models/noisy_drone_rf_v2/noisy_drone_rf_v2_vgg_full_complex_spectrogram.onnx
+models/noisy_drone_rf_v2/labels.json
+models/noisy_drone_rf_v2/sample_input.npy
+models/noisy_drone_rf_v2/run_onnx_inference.sh
+```
+
+Build a TensorRT FP16 engine on the Jetson:
+
+```bash
+/usr/src/tensorrt/bin/trtexec \
+  --onnx=models/noisy_drone_rf_v2/noisy_drone_rf_v2_vgg_full_complex_spectrogram.onnx \
+  --saveEngine=models/noisy_drone_rf_v2/noisy_drone_rf_v2_vgg_full_complex_spectrogram_fp16.engine \
+  --fp16 \
+  --verbose
+```
+
+Benchmark the TensorRT engine:
+
+```bash
+/usr/src/tensorrt/bin/trtexec \
+  --loadEngine=models/noisy_drone_rf_v2/noisy_drone_rf_v2_vgg_full_complex_spectrogram_fp16.engine \
+  --warmUp=500 \
+  --duration=30 \
+  --iterations=1000
+```
+
+Record:
+
+```text
+hardware
+JetPack / TensorRT version
+engine build command
+benchmark command
+latency
+throughput
+any unsupported ONNX ops or conversion warnings
+```
+
+## 4. Add Runtime Profiling Notes
+
+**Goal:** Capture where time is spent once the edge inference path is running.
+
+Profile goals:
+
+```text
+end-to-end inference latency
+CPU preprocessing time
+accelerator inference time
+host/device copy overhead
+service/request overhead, if serving through an API
+batching behavior
+```
+
+Expected documentation:
+
+```text
+docs/runtime_profile.md
+```
+
+Include:
+
+```text
+command used to capture the profile
+hardware/software versions
+screenshots or exported summaries if useful
+bottlenecks found
+changes made after profiling
+```
+
+## 5. Add An Optional RF Serving Example
+
+**Goal:** Make the exported RF model easy to exercise from a small service or another repository without mixing service code into the research workflow.
+
+Useful example files:
+
+```text
+examples/rf_signal_intelligence/
+  README.md
+  labels.json
+  sample_input.npy
+  curl_predict.sh
+  benchmark_rf.py
+```
+
+The serving example should support shaped RF spectrogram inputs and use the same `labels.json` produced by `rfsi export-onnx`.
+
+## 6. Expand OTA Test Coverage
+
+**Goal:** Strengthen the live over-the-air result beyond the initial class sweep.
+
+Useful follow-up runs:
+
+```text
+include Noise in class-sweep summaries
+run multiple SNR thresholds, such as 20, 10, and 0 dB
+repeat one lower-power TX setting
+record clipping percentage and capture power in every summary table
+save representative wins and misses, not every plot
+```
+
+Keep the language careful: these tests show controlled SDR replay/receive classification, not field collection from live drones.

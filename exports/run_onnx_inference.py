@@ -28,6 +28,18 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--iq-file", help="Raw IQ file to window, spectrogram, scan, and classify.")
     parser.add_argument("--labels", default="models/noisy_drone_rf_v2/labels.json")
     parser.add_argument("--providers", default="CPUExecutionProvider")
+    parser.add_argument(
+        "--intra-op-threads",
+        type=int,
+        default=1,
+        help="ONNX Runtime intra-op thread count. Default 1 avoids Jetson CPU affinity issues.",
+    )
+    parser.add_argument(
+        "--inter-op-threads",
+        type=int,
+        default=1,
+        help="ONNX Runtime inter-op thread count. Default 1 avoids Jetson CPU affinity issues.",
+    )
     parser.add_argument("--top-k", type=int, default=3)
     parser.add_argument("--iterations", type=int, default=1)
     parser.add_argument(
@@ -415,7 +427,10 @@ def make_session(args: argparse.Namespace):
     providers = [provider for provider in requested if provider in available]
     if not providers:
         raise RuntimeError(f"Requested providers are unavailable. Available providers: {sorted(available)}")
-    return ort.InferenceSession(args.onnx, providers=providers)
+    session_options = ort.SessionOptions()
+    session_options.intra_op_num_threads = args.intra_op_threads
+    session_options.inter_op_num_threads = args.inter_op_threads
+    return ort.InferenceSession(args.onnx, sess_options=session_options, providers=providers)
 
 
 def main() -> int:
