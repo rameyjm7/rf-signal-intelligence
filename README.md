@@ -96,6 +96,20 @@ preserved on the `archive/legacy-notebooks` branch.
 ### DeepRadar2022
 Radar waveform dataset used for CNN-BiLSTM style modeling and transfer evaluation.
 
+Detailed dataset cards are available under [`docs/dataset_cards/`](docs/dataset_cards/):
+
+- [Noisy Drone RF v2](docs/dataset_cards/noisy_drone_rf_v2.md)
+- [RML2016.10A](docs/dataset_cards/rml2016.md)
+- [RML2018.01A](docs/dataset_cards/rml2018.md)
+- [DeepRadar2022](docs/dataset_cards/deepradar2022.md)
+
+Model cards are available under [`docs/model_cards/`](docs/model_cards/):
+
+- [NoisyDroneRFv2 VGG](docs/model_cards/noisy_drone_rf_v2_vgg.md)
+- [RML2016 CNN-transformer](docs/model_cards/rml2016_cnn_transformer.md)
+- [RML2018 LSTM](docs/model_cards/rml2018_lstm.md)
+- [DeepRadar2022 CNN-transformer](docs/model_cards/deepradar2022_cnn_transformer.md)
+
 ## Results: RML2016
 
 ### Summary
