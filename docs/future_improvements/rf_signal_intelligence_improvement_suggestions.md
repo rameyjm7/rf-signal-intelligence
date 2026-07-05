@@ -106,7 +106,7 @@ bottlenecks found
 changes made after profiling
 ```
 
-## 5. Add An Optional RF Serving Example
+## 4. Add An Optional RF Serving Example
 
 **Goal:** Make the exported RF model easy to exercise from a small service or another repository without mixing service code into the research workflow.
 
@@ -123,7 +123,7 @@ examples/rf_signal_intelligence/
 
 The serving example should support shaped RF spectrogram inputs and use the same `labels.json` produced by `rfsi export-onnx`.
 
-## 6. Expand OTA Test Coverage
+## 5. Expand OTA Test Coverage
 
 **Goal:** Strengthen the live over-the-air result beyond the initial class sweep.
 
@@ -138,3 +138,22 @@ save representative wins and misses, not every plot
 ```
 
 Keep the language careful: these tests show controlled SDR replay/receive classification, not field collection from live drones.
+
+## 6. Split The Live Classifier Into Smaller Modules
+
+**Goal:** Keep the live SDR demo powerful while making the implementation easier to review, test, and extend.
+
+Suggested package shape:
+
+```text
+src/rf_signal_intelligence/live/
+  cli.py
+  sdr_rx.py
+  sdr_tx.py
+  preprocessing.py
+  inference.py
+  sweep.py
+  reporting.py
+```
+
+The current script can remain as the user-facing entrypoint, but most implementation details should move behind these modules. That would make the live RF classifier look more maintainable and production-style without changing the command-line workflow.
