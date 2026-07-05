@@ -70,7 +70,7 @@ src/ml_wireless_classification/   Python package
   features/                       Reusable RF feature extraction
   workflows/                      Config-driven training/evaluation/export workflows
   models/                         Maintained model definitions
-  legacy/                         Experimental utilities kept for archive notebooks
+  legacy/                         Compatibility shims for older experiments
   base/                           Backward-compatible import wrappers
 configs/                          Dataset and model registries (YAML)
 data/                             Datasets (RML2016, RML2018, DeepRadar2022)
@@ -80,8 +80,10 @@ notebooks/                        Reproducible notebooks
 docker/                           Docker and Apptainer build/runtime files
 docs/                             Project reports and papers
 tests/                            Test and integration checks
-archive/                          Archived experiments and prototype artifacts
 ```
+
+Archived experiments and prototype notebooks were moved out of this working branch and are
+preserved on the `archive/legacy-notebooks` branch.
 
 ## Datasets
 
