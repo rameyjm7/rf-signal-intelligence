@@ -93,5 +93,5 @@ The live script reports per-window inference latency and throughput. The practic
 ## Export / Deployment Status
 
 - Keras checkpoint: available.
-- ONNX export path: `rfsi export-onnx --config configs/noisy_drone_vgg.yaml`, which writes ONNX, `sample_input.npy`, `labels.json`, and validates ONNX Runtime output against Keras by default.
+- ONNX export path: `rfsi export-onnx --config configs/noisy_drone_vgg.yaml`, which writes ONNX, `sample_input.npy`, `labels.json`, a runnable `run_onnx_inference.sh` helper, and validates ONNX Runtime output against Keras by default.
 - First-class ONNX to TensorRT / Jetson deployment path: `docs/jetson_tensorrt_deployment.md`.

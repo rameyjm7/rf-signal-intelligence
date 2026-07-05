@@ -55,10 +55,17 @@ Outputs:
 - `models/noisy_drone_rf_v2/noisy_drone_rf_v2_vgg_full_complex_spectrogram.onnx`
 - `models/noisy_drone_rf_v2/sample_input.npy`
 - `models/noisy_drone_rf_v2/labels.json`
+- `models/noisy_drone_rf_v2/run_onnx_inference.sh`
 
 Pass `--sample-iq path/to/IQdata_sample...pt` to save a real spectrogram sample instead of a zero-valued shape sample.
 
 By default this command also validates ONNX Runtime output against the Keras checkpoint. Use `--no-validate` only when you are exporting on a machine without `onnxruntime` installed.
+
+Immediately run a local CPU classification from the exported sample:
+
+```bash
+models/noisy_drone_rf_v2/run_onnx_inference.sh --providers CPUExecutionProvider
+```
 
 ## 2. Validate ONNX Against Keras
 

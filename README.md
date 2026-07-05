@@ -404,6 +404,9 @@ rfsi export-onnx \
   --out models/noisy_drone_rf_v2/noisy_drone_rf_v2_vgg_full_complex_spectrogram.onnx \
   --sample-out models/noisy_drone_rf_v2/sample_input.npy \
   --labels-out models/noisy_drone_rf_v2/labels.json
+
+# Run the exported ONNX model locally on CPU.
+models/noisy_drone_rf_v2/run_onnx_inference.sh --providers CPUExecutionProvider
 ```
 
 Suggested end-to-end flow:

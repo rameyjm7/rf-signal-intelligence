@@ -718,11 +718,29 @@ def write_noisy_drone_export_bundle(
     if labels is None:
         labels = ["DJI", "FutabaT14", "FutabaT7", "Graupner", "Noise", "Taranis", "Turnigy"]
     labels_path.write_text(json.dumps(labels, indent=2), encoding="utf-8")
+    inference_script_path = onnx_path.parent / "run_onnx_inference.sh"
+    inference_script = "\n".join(
+        [
+            "#!/usr/bin/env bash",
+            "set -euo pipefail",
+            f'PYTHON="${{PYTHON:-{project_root / ".venv" / "bin" / "python3"}}}"',
+            'if [[ ! -x "$PYTHON" ]]; then PYTHON="$(command -v python3)"; fi',
+            f'"$PYTHON" "{project_root / "exports" / "run_onnx_inference.py"}" \\',
+            f'  --onnx "{onnx_path}" \\',
+            f'  --input "{sample_path}" \\',
+            f'  --labels "{labels_path}" \\',
+            '  "$@"',
+            "",
+        ]
+    )
+    inference_script_path.write_text(inference_script, encoding="utf-8")
+    inference_script_path.chmod(0o755)
 
     return {
         "onnx_path": str(onnx_path),
         "sample_input_path": str(sample_path),
         "labels_path": str(labels_path),
+        "inference_script_path": str(inference_script_path),
         "input_shape": [None, *spec_cfg.input_shape],
         "labels": labels,
     }

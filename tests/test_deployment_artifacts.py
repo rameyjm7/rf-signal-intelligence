@@ -5,6 +5,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 DEPLOYMENT_FILES = [
     "exports/export_noisy_drone_to_onnx.py",
     "exports/validate_onnx.py",
+    "exports/run_onnx_inference.py",
     "deploy/build_tensorrt_engine.sh",
     "deploy/run_trtexec_benchmark.sh",
     "deploy/run_jetson_inference.py",
@@ -40,3 +41,10 @@ def test_export_scripts_expose_expected_flags():
         assert flag in export_text
     for flag in ["--keras-model", "--onnx", "--sample", "--labels"]:
         assert flag in validate_text
+
+
+def test_local_onnx_inference_script_exposes_expected_flags():
+    text = (REPO_ROOT / "exports/run_onnx_inference.py").read_text(encoding="utf-8")
+
+    for flag in ["--onnx", "--input", "--labels", "--providers", "--top-k"]:
+        assert flag in text
