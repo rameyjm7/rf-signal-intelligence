@@ -44,7 +44,7 @@ Implemented workflows include:
 - Config-driven CLI entrypoints for training, evaluation, comparison, and ONNX export
 - Jetson TensorRT FP16 benchmarking and profiling support
 
-The notebooks remain available, but the project is moving toward reusable package code and reproducible CLI workflows.
+The notebooks remain available as convenient HPC frontends, while maintained workflows live in reusable package code and CLI entrypoints.
 
 ## Live OTA Noisy Drone Demo
 
@@ -101,7 +101,7 @@ Full evidence:
 | Jetson TensorRT | Direct per-class validation | 7/7 classes matched |
 | RML2016 | CNN-transformer, all SNR levels | 0.6645 accuracy |
 | RML2016 | CNN-transformer, SNR > -2 dB | 0.8969 accuracy |
-| RML2018 | LSTM continued checkpoint, current notebook protocol | 0.8295 accuracy |
+| RML2018 | LSTM continued checkpoint, documented evaluation protocol | 0.8295 accuracy |
 
 Detailed offline result history, older plots, and protocol notes live in [docs/results/offline_model_results.md](docs/results/offline_model_results.md). Dataset/model caveats are documented in the cards under `docs/`.
 
