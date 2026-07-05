@@ -27,9 +27,13 @@ def _install_fake_tensorflow(monkeypatch):
     tf = types.ModuleType("tensorflow")
     keras = types.ModuleType("tensorflow.keras")
     layers = types.ModuleType("tensorflow.keras.layers")
+    models = types.ModuleType("tensorflow.keras.models")
     optimizers = types.ModuleType("tensorflow.keras.optimizers")
 
     keras.Sequential = _FakeSequential
+    models.Sequential = _FakeSequential
+    models.clone_model = lambda model: model
+    models.load_model = lambda *_args, **_kwargs: _FakeSequential()
     optimizers.Adam = _FakeAdam
     for name in [
         "BatchNormalization",
@@ -43,12 +47,14 @@ def _install_fake_tensorflow(monkeypatch):
     ]:
         setattr(layers, name, _FakeLayer)
     keras.layers = layers
+    keras.models = models
     keras.optimizers = optimizers
     tf.keras = keras
 
     monkeypatch.setitem(sys.modules, "tensorflow", tf)
     monkeypatch.setitem(sys.modules, "tensorflow.keras", keras)
     monkeypatch.setitem(sys.modules, "tensorflow.keras.layers", layers)
+    monkeypatch.setitem(sys.modules, "tensorflow.keras.models", models)
     monkeypatch.setitem(sys.modules, "tensorflow.keras.optimizers", optimizers)
 
 
@@ -60,6 +66,17 @@ def test_rml2018_lstm_builder_compiles_model(monkeypatch):
 
     assert isinstance(model, _FakeSequential)
     assert len(model.layers) == 7
+    assert model.compiled["loss"] == "sparse_categorical_crossentropy"
+
+
+def test_rml2016_lstm_builder_compiles_model(monkeypatch):
+    _install_fake_tensorflow(monkeypatch)
+    from rf_signal_intelligence.models.rml2016_lstm import build_rml2016_lstm_model
+
+    model = build_rml2016_lstm_model((128, 3), 11, learning_rate=1e-4)
+
+    assert isinstance(model, _FakeSequential)
+    assert len(model.layers) == 17
     assert model.compiled["loss"] == "sparse_categorical_crossentropy"
 
 
