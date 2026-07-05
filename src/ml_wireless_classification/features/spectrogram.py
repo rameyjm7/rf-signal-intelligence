@@ -47,6 +47,27 @@ def normalize_iq_window(iq: np.ndarray) -> np.ndarray:
     return window / scale
 
 
+def normalize_iq_per_sample(x: np.ndarray) -> np.ndarray:
+    """Normalize each IQ sample by its maximum absolute value."""
+    values = np.asarray(x, dtype=np.float32)
+    normalized = np.empty_like(values)
+    for idx in range(values.shape[0]):
+        scale = np.max(np.abs(values[idx])) + 1e-12
+        normalized[idx] = values[idx] / scale
+    return normalized
+
+
+def append_snr_feature(x: np.ndarray, snr: np.ndarray, *, scale: float = 20.0) -> np.ndarray:
+    """Append normalized SNR as a third feature channel."""
+    values = np.asarray(x, dtype=np.float32)
+    snr_values = np.asarray(snr, dtype=np.float32)
+    rows = []
+    for idx in range(values.shape[0]):
+        snr_col = np.full((values.shape[1], 1), snr_values[idx] / scale, dtype=np.float32)
+        rows.append(np.concatenate([values[idx], snr_col], axis=1))
+    return np.asarray(rows, dtype=np.float32)
+
+
 def resize_time_axis(arr: np.ndarray, target_bins: int) -> np.ndarray:
     """Resize a spectrogram time axis using row-wise linear interpolation."""
     if arr.shape[1] == target_bins:
