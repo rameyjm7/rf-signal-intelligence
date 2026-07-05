@@ -31,9 +31,9 @@ Result:
 
 | Runtime | Platform | Precision | Mean Latency | Status |
 |---|---|---|---:|---|
-| Keras/TensorFlow | x86/Jetson | FP32 | TBD | Not benchmarked in this report |
-| ONNX Runtime CPU | Jetson | FP32 | TBD | Not benchmarked in this report |
 | TensorRT `trtexec` | Jetson Orin | FP16 | 79.0 ms | Measured |
+
+Planned baselines: Keras/TensorFlow FP32 and ONNX Runtime CPU/CUDA.
 
 ## TensorRT Correctness Check
 

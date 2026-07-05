@@ -4,13 +4,14 @@
 ![TensorFlow](https://img.shields.io/badge/TensorFlow-2.x-orange)
 ![CUDA](https://img.shields.io/badge/CUDA-11.8-green)
 ![Docker](https://img.shields.io/badge/Docker-GPU--Ready-blue)
+![SoapySDR](https://img.shields.io/badge/SoapySDR-Live%20SDR-purple)
 
 **Maintainer:** Jacob M. Ramey  
 LinkedIn: https://www.linkedin.com/in/rameyjm/
 
 Built a real-time RF drone-classification pipeline using live SDR-to-SDR IQ replay/receive, spectrogram-based VGG inference, ONNX export, TensorRT FP16 deployment on NVIDIA Jetson, and Nsight/trtexec profiling; achieved 68/70 exact OTA class matches across seven NoisyDroneRFv2 classes.
 
-This repo now covers the full practical path:
+This repo covers the full practical path:
 
 ```text
 public RF datasets -> reusable training/evaluation code -> live SDR replay/receive -> ONNX export -> Jetson TensorRT deployment
@@ -37,7 +38,7 @@ public RF datasets -> reusable training/evaluation code -> live SDR replay/recei
 Implemented workflows include:
 
 - NoisyDroneRFv2 VGG full-complex spectrogram classification
-- Live over-the-air SDR replay/receive classification
+- Live over-the-air SDR replay/receive classification using SoapySDR, bladeRF TX, and HackRF RX
 - RML2016, RML2018, and DeepRadar2022 training/evaluation experiments
 - Reusable Python workflows under `src/rf_signal_intelligence/`
 - Config-driven CLI entrypoints for training, evaluation, comparison, and ONNX export
@@ -303,9 +304,9 @@ Runtime comparison:
 
 | Runtime | Platform | Precision | Mean latency |
 |---|---|---|---:|
-| Keras/TensorFlow | x86/Jetson | FP32 | TBD |
-| ONNX Runtime CPU | Jetson | FP32 | TBD |
 | TensorRT | Jetson | FP16 | 79.0 ms |
+
+Planned baselines: Keras/TensorFlow FP32 and ONNX Runtime CPU/CUDA.
 
 See:
 
