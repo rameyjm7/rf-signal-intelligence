@@ -1,0 +1,12 @@
+workflow: deepradar2022_eval
+project_root: .
+outputs_dir: outputs/deepradar2022_eval
+
+dataset:
+  x_test: /scratch/rameyjm7/datasets/DeepRadar2022/X_test.mat
+  y_test: /scratch/rameyjm7/datasets/DeepRadar2022/Y_test.mat
+  lbl_test: /scratch/rameyjm7/datasets/DeepRadar2022/lbl_test.mat
+
+model:
+  id: deepradar2022_cnn_bilstm_final
+  checkpoint: models/deepradar2022/deepradar2022_cnn_bilstm_final.keras

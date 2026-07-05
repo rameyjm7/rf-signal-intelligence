@@ -3,9 +3,9 @@ requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "ml_wireless_classification"
+name = "rf-signal-intelligence"
 version = "0.1.0"
-description = "ML Wireless Classification"
+description = "RF Signal Intelligence"
 readme = "README.md"
 requires-python = ">=3.10"
 license = { file = "LICENSE" }
@@ -36,13 +36,25 @@ dev = [
   "build",
   "twine",
 ]
+noisy-drone = [
+  "torch",
+]
+deploy = [
+  "tf2onnx",
+  "onnx",
+  "onnxruntime",
+]
 gpu = [
   "tensorflow[and-cuda]>=2.16; platform_system == 'Linux'",
 ]
+ml = [
+  "torch",
+]
 
 [project.scripts]
-start = "ml_wireless_classification:create_app"
-ml-wireless-classification = "ml_wireless_classification:main"
+start = "rf_signal_intelligence:create_app"
+rf-signal-intelligence = "rf_signal_intelligence:main"
+rfsi = "rf_signal_intelligence.cli:main"
 
 [tool.setuptools]
 package-dir = { "" = "src" }
@@ -55,16 +67,15 @@ line-length = 100
 target-version = "py310"
 src = ["src", "tests"]
 exclude = [
-  "archive",
   "data",
   "docs",
   "models",
   "notebooks",
-  "src/ml_wireless_classification/base",
-  "src/ml_wireless_classification/legacy",
-  "src/ml_wireless_classification/core/base_classifier.py",
-  "src/ml_wireless_classification/models/rnn_lstm_with_snr.py",
-  "src/ml_wireless_classification/__about__.py",
+  "src/rf_signal_intelligence/base",
+  "src/rf_signal_intelligence/legacy",
+  "src/rf_signal_intelligence/core/base_classifier.py",
+  "src/rf_signal_intelligence/models/rnn_lstm_with_snr.py",
+  "src/rf_signal_intelligence/__about__.py",
 ]
 
 [tool.ruff.lint]

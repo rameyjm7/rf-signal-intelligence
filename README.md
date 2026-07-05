@@ -64,10 +64,13 @@ Notebook `50` now evaluates Noisy Drone RF v2 in a dedicated eval-only cell and 
 ## Repository Layout
 
 ```text
-src/ml_wireless_classification/   Python package
+src/rf_signal_intelligence/   Python package
   core/                           Maintained runtime/training components
+  data/                           Dataset manifests and IQ loading helpers
+  features/                       Reusable RF feature extraction
+  workflows/                      Config-driven training/evaluation/export workflows
   models/                         Maintained model definitions
-  legacy/                         Experimental utilities kept for archive notebooks
+  legacy/                         Compatibility shims for older experiments
   base/                           Backward-compatible import wrappers
 configs/                          Dataset and model registries (YAML)
 data/                             Datasets (RML2016, RML2018, DeepRadar2022)
@@ -77,8 +80,10 @@ notebooks/                        Reproducible notebooks
 docker/                           Docker and Apptainer build/runtime files
 docs/                             Project reports and papers
 tests/                            Test and integration checks
-archive/                          Archived experiments and prototype artifacts
 ```
+
+Archived experiments and prototype notebooks were moved out of this working branch and are
+preserved on the `archive/legacy-notebooks` branch.
 
 ## Datasets
 
@@ -90,6 +95,24 @@ archive/                          Archived experiments and prototype artifacts
 
 ### DeepRadar2022
 Radar waveform dataset used for CNN-BiLSTM style modeling and transfer evaluation.
+
+Detailed dataset cards are available under [`docs/dataset_cards/`](docs/dataset_cards/):
+
+- [Noisy Drone RF v2](docs/dataset_cards/noisy_drone_rf_v2.md)
+- [RML2016.10A](docs/dataset_cards/rml2016.md)
+- [RML2018.01A](docs/dataset_cards/rml2018.md)
+- [DeepRadar2022](docs/dataset_cards/deepradar2022.md)
+
+Model cards are available under [`docs/model_cards/`](docs/model_cards/):
+
+- [NoisyDroneRFv2 VGG](docs/model_cards/noisy_drone_rf_v2_vgg.md)
+- [RML2016 CNN-transformer](docs/model_cards/rml2016_cnn_transformer.md)
+- [RML2018 LSTM](docs/model_cards/rml2018_lstm.md)
+- [DeepRadar2022 CNN-transformer](docs/model_cards/deepradar2022_cnn_transformer.md)
+
+NVIDIA edge deployment path:
+
+- [Jetson TensorRT deployment guide](docs/jetson_tensorrt_deployment.md)
 
 ## Results: RML2016
 
@@ -238,6 +261,83 @@ Existing result snapshots are retained below for continuity.
 | **Weighted avg** | **0.98** | **0.98** | **0.98** | **203** |
 
 
+## Live RF Drone Classifier
+
+Run the NoisyDroneRFv2 model against IQ playback, live SDR receive, or SDR-to-SDR over-the-air replay.
+
+Pipeline:
+
+```text
+IQ source -> windowing -> preprocessing/spectrogram -> model inference -> class/confidence -> latency/throughput reporting
+```
+
+The live script accepts `.npy`, `.npz`, `.pt`, and raw complex64 `.bin` / `.c64` IQ files for playback. It also supports SoapySDR receive and an optional TX path for replaying labeled NoisyDroneRFv2 samples from one SDR into another.
+
+IQ file playback:
+
+```bash
+python scripts/live_noisy_drone_rf_classifier.py \
+  --iq-file outputs/rx_debug.npy \
+  --model models/noisy_drone_rf_v2/noisy_drone_rf_v2_vgg_full_complex_spectrogram_best.keras \
+  --window-samples 1048576 \
+  --nfft 1024 \
+  --hop 1024 \
+  --time-bins 1024 \
+  --once
+```
+
+Live SDR receive with SoapySDR:
+
+```bash
+python scripts/live_noisy_drone_rf_classifier.py \
+  --device-args driver=hackrf \
+  --freq 2.399e9 \
+  --sample-rate 20e6 \
+  --bandwidth 20e6 \
+  --gain 60 \
+  --model models/noisy_drone_rf_v2/noisy_drone_rf_v2_vgg_full_complex_spectrogram_best.keras
+```
+
+SDR-to-SDR replay and receive demo:
+
+```bash
+python scripts/live_noisy_drone_rf_classifier.py \
+  --tx \
+  --tx-dataset-dir /data/rameyjm7/datasets/NoisyDroneRFv2 \
+  --tx-class-name DJI \
+  --tx-min-snr 24 \
+  --device-args driver=hackrf \
+  --tx-device-args driver=bladerf \
+  --freq 2.399e9 \
+  --sample-rate 20e6 \
+  --bandwidth 20e6 \
+  --tx-bandwidth 20e6 \
+  --gain 60 \
+  --tx-gain 60 \
+  --once \
+  --save-rx-iq outputs/rx_debug.npy
+```
+
+Reproduce the documented OTA class-sweep report:
+
+```bash
+python scripts/live_noisy_drone_rf_classifier.py \
+  --tx-test-all-classes \
+  --tx-test-classes DJI,FutabaT14,FutabaT7,Graupner,Noise,Taranis,Turnigy \
+  --tx-test-count 10 \
+  --tx-min-snr 20 \
+  --tx-test-output-csv outputs/noisy_drone_rf_v2_snr20_class_sweep.csv \
+  --tx-test-output-md results/noisy_drone_rf_v2/snr20_class_sweep_results.md \
+  --tx-test-save-rx-dir outputs/noisy_drone_rf_v2_snr20_iq \
+  --tx-test-save-plots-dir results/noisy_drone_rf_v2/snr20_waterfalls
+```
+
+Suggested resume bullet:
+
+```text
+Built a live RF drone-classification pipeline with IQ playback/receive, windowed preprocessing, spectrogram-based deep-learning inference, confidence reporting, and latency instrumentation for real-time RF sensor-processing workflows.
+```
+
 
 ## Requirements
 
@@ -261,6 +361,12 @@ pip install -e ".[dev,test]"
 pre-commit install
 ```
 
+For NoisyDroneRFv2 `.pt` dataset evaluation:
+
+```bash
+pip install -e ".[noisy-drone]"
+```
+
 For GPU-focused environments (Linux):
 
 ```bash
@@ -277,16 +383,78 @@ If your dataset is elsewhere, pass `--data-path`.
 
 ## CLI Usage
 
-Run as module:
+The preferred reproducible workflow is moving from notebook-only execution to the
+`rfsi` CLI plus small notebooks that call reusable code under `src/`.
 
 ```bash
-python -m ml_wireless_classification --mode evaluate_only
+# Train or continue the canonical NoisyDroneRFv2 VGG spectrogram model.
+rfsi train --config configs/noisy_drone_vgg.yaml
+
+# Evaluate the canonical NoisyDroneRFv2 VGG spectrogram model.
+rfsi evaluate \
+  --config configs/noisy_drone_vgg.yaml \
+  --checkpoint models/noisy_drone_rf_v2/noisy_drone_rf_v2_vgg_full_complex_spectrogram_best.keras
+
+# Rebuild the cross-dataset comparison artifacts.
+rfsi compare --config configs/evaluation_comparison.yaml
+
+# Export the NoisyDroneRFv2 model for deployment work.
+rfsi export-onnx \
+  --config configs/noisy_drone_vgg.yaml \
+  --out models/noisy_drone_rf_v2/noisy_drone_rf_v2_vgg_full_complex_spectrogram.onnx \
+  --sample-out models/noisy_drone_rf_v2/sample_input.npy \
+  --labels-out models/noisy_drone_rf_v2/labels.json
+
+# Run the exported ONNX model locally on CPU.
+models/noisy_drone_rf_v2/run_onnx_inference.sh --providers CPUExecutionProvider
+
+# Inspect the strongest non-Noise class when the raw model top-1 is Noise.
+models/noisy_drone_rf_v2/run_onnx_inference.sh \
+  --providers CPUExecutionProvider \
+  --decision-mode non-noise
+
+# Scan a raw IQ capture, score burst windows by the target class, and classify the best window.
+models/noisy_drone_rf_v2/run_onnx_inference.sh \
+  --iq-file outputs/rx_debug.npy \
+  --target-class FutabaT14 \
+  --window-score-mode target \
+  --decision-mode non-noise \
+  --providers CPUExecutionProvider
+
+# Run one high-SNR dataset sample per class and print a readable table.
+models/noisy_drone_rf_v2/run_onnx_inference.sh \
+  --class-sweep \
+  --dataset-dir /data/rameyjm7/datasets/NoisyDroneRFv2 \
+  --min-snr 20 \
+  --samples-per-class 1 \
+  --max-predictions 8 \
+  --format table \
+  --providers CPUExecutionProvider
+```
+
+Suggested end-to-end flow:
+
+1. Install the package.
+2. Download datasets or point `configs/local_data_paths.yaml` / workflow configs at local data.
+3. Train or evaluate with `rfsi`.
+4. Export artifacts and comparison tables.
+5. Reproduce the headline metrics table.
+6. Run the live SDR classifier.
+7. Deploy the exported ONNX model through TensorRT / Jetson.
+
+Older notebooks are retained, but the largest NoisyDroneRFv2 and comparison notebooks now act
+as thin wrappers around reusable Python modules.
+
+Legacy RML2016 entrypoint:
+
+```bash
+python -m rf_signal_intelligence --mode evaluate_only
 ```
 
 Or installed console script:
 
 ```bash
-ml-wireless-classification --mode evaluate_only
+rf-signal-intelligence --mode evaluate_only
 ```
 
 Supported modes:

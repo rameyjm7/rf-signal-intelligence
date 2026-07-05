@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from ml_wireless_classification.__main__ import _default_outputs_root, _resolve_models_dir
+from rf_signal_intelligence.__main__ import _default_outputs_root, _resolve_models_dir
 
 
 def test_default_outputs_root_uses_repo_outputs_dir(tmp_path: Path):
