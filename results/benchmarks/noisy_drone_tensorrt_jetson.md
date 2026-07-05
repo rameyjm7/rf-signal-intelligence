@@ -27,6 +27,14 @@ Result:
 |---|---|---:|---:|---:|---:|
 | TensorRT `trtexec` | FP16 | 1 | 79.0 ms | 79.01 ms | 12.58 qps |
 
+## Runtime Baseline Table
+
+| Runtime | Platform | Precision | Mean Latency | Status |
+|---|---|---|---:|---|
+| Keras/TensorFlow | x86/Jetson | FP32 | TBD | Not benchmarked in this report |
+| ONNX Runtime CPU | Jetson | FP32 | TBD | Not benchmarked in this report |
+| TensorRT `trtexec` | Jetson Orin | FP16 | 79.0 ms | Measured |
+
 ## TensorRT Correctness Check
 
 Validated direct TensorRT engine inference on one preprocessed NoisyDroneRFv2 sample per class:

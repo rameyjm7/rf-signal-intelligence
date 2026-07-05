@@ -47,11 +47,13 @@ The notebooks remain available, but the project is moving toward reusable packag
 
 ## Live OTA Noisy Drone Demo
 
-The strongest current demo replays labeled NoisyDroneRFv2 IQ samples from one SDR and classifies the received live RF capture from another SDR. This checks the model through a real TX/RX hardware path, not only offline dataset inference.
+The strongest current demo replays labeled NoisyDroneRFv2 IQ samples from one SDR and classifies the received live RF capture from another SDR.
 
 ```text
 NoisyDroneRFv2 IQ sample -> SDR TX replay -> live RF capture -> waterfall window selection -> VGG spectrogram model -> class/confidence
 ```
+
+This validates the classifier through an actual RF transmit/receive hardware path rather than only offline dataset inference.
 
 | Test | Result |
 |---|---:|
@@ -297,6 +299,14 @@ Keras model -> ONNX export -> TensorRT FP16 engine -> Jetson inference -> trtexe
 | Direct TensorRT class validation | 7/7 classes matched |
 | Nsight Systems profile | Captured and summarized |
 
+Runtime comparison:
+
+| Runtime | Platform | Precision | Mean latency |
+|---|---|---|---:|
+| Keras/TensorFlow | x86/Jetson | FP32 | TBD |
+| ONNX Runtime CPU | Jetson | FP32 | TBD |
+| TensorRT | Jetson | FP16 | 79.0 ms |
+
 See:
 
 - [Jetson TensorRT deployment guide](docs/jetson_tensorrt_deployment.md)
@@ -343,6 +353,4 @@ See [docker/README.md](docker/README.md) for Docker Hub and Apptainer/HPC usage.
 
 ## Citation
 
-Ramey, J. M., and Goda, P. (2025). Wireless Signal Classification via Deep Learning.  
-Maintained by Jacob M. Ramey.  
-GitHub: https://github.com/rameyjm7/rf-signal-intelligence
+Jacob M. Ramey. RF Signal Intelligence: Real-Time RF Drone Classification with SDR, ONNX, TensorRT, and Jetson Deployment. 2025.
