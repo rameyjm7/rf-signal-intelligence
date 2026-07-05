@@ -8,12 +8,13 @@
 **Maintainer:** Jacob M. Ramey  
 LinkedIn: https://www.linkedin.com/in/rameyjm/
 
-GPU-ready RF/IQ machine-learning workspace for modulation recognition, radar waveform analysis, signal preprocessing, model evaluation, and reproducible dataset workflows.
+GPU-ready RF/IQ machine-learning workspace for modulation recognition, radar waveform analysis, SDR-backed RF sensing, model evaluation, and reproducible deployment workflows.
 
-The current work centers on wireless signal classification, with room to grow into broader RFML tasks such as signal embeddings, anomaly detection, streaming inference, and SDR-backed dataset generation.
+This project now spans the full RF ML path: public dataset training/evaluation, live SDR replay/receive testing, ONNX export, Jetson TensorRT deployment, and profiling.
 
 ## Table of Contents
 - [Overview](#overview)
+- [Live OTA Noisy Drone Demo](#live-ota-noisy-drone-demo)
 - [Current Progress (July 2026)](#current-progress-july-2026)
 - [Repository Layout](#repository-layout)
 - [Datasets](#datasets)
@@ -24,6 +25,8 @@ The current work centers on wireless signal classification, with room to grow in
 - [Requirements](#requirements)
 - [Local Setup](#local-setup)
 - [CLI Usage](#cli-usage)
+- [Live RF Drone Classifier](#live-rf-drone-classifier)
+- [Jetson TensorRT Deployment](#jetson-tensorrt-deployment)
 - [Docker](#docker)
 - [Notes](#notes)
 - [Citation](#citation)
@@ -36,10 +39,48 @@ Implemented workflows include:
 - LSTM and BiLSTM architectures for raw I/Q modeling
 - CNN + recurrent hybrids for time-frequency structure
 - Cross-dataset experimentation on RML2016, RML2018, and DeepRadar2022
+- Live over-the-air SDR replay/receive classification for NoisyDroneRFv2
+- ONNX export and TensorRT FP16 deployment on NVIDIA Jetson
 - GPU-ready execution via Docker/Apptainer
+
+## Live OTA Noisy Drone Demo
+
+The strongest current demo replays labeled NoisyDroneRFv2 IQ samples from one SDR and classifies the received live RF capture from another SDR. This checks the model through a real TX/RX hardware path, not only offline dataset inference.
+
+Pipeline:
+
+```text
+NoisyDroneRFv2 IQ sample -> SDR TX replay -> live RF capture -> waterfall window selection -> VGG spectrogram model -> class/confidence
+```
+
+Headline run:
+
+| Test | Result |
+|---|---:|
+| Classes | 7 |
+| Trials | 70 |
+| Exact final prediction matches | 68/70 |
+| OTA sweep accuracy | 0.971 |
+| Frequency | 2.399 GHz |
+| Sample rate | 20 MS/s |
+| Bandwidth | 20 MHz |
+
+Representative live RX waterfall/classification overlays:
+
+| DJI live OTA classification | Taranis live OTA classification |
+|---|---|
+| ![DJI live OTA waterfall classification](results/noisy_drone_rf_v2/snr20_waterfalls/001_DJI_waterfall.png) | ![Taranis live OTA waterfall classification](results/noisy_drone_rf_v2/snr20_waterfalls/052_Taranis_waterfall.png) |
+
+Full report and artifacts:
+
+- [70-trial OTA SDR-to-SDR SNR >= 20 dB sweep report](results/noisy_drone_rf_v2/snr20_class_sweep_results.md)
+- [NoisyDroneRFv2 model card](docs/model_cards/noisy_drone_rf_v2_vgg.md)
+- [Jetson TensorRT benchmark/profile summary](results/benchmarks/noisy_drone_tensorrt_jetson.md)
 
 ## Current Progress (July 2026)
 
+- Live OTA NoisyDroneRFv2 SDR-to-SDR sweep reached `68/70` exact final prediction matches across seven classes.
+- NoisyDroneRFv2 was exported to ONNX, converted to TensorRT FP16, validated on Jetson with 7/7 class samples, and profiled with Nsight Systems.
 - RML2018 was rebaselined with a new continuation training run; best checkpoint evaluation reached `0.8295` accuracy on the current filtered protocol used in notebook evaluation.
 - Cross-dataset ensemble evaluation (`43`) is now aligned with pinned best-checkpoint loading and class-order calibration, producing stable combined results (recent run: `0.96` overall on the sampled combined set).
 - Notebook naming and pipeline flow were standardized:
@@ -473,6 +514,28 @@ Defaults:
 - Stats/logs are written under `outputs/`.
 - If `models/<model-name>.keras` already exists, CLI will use it by default for compatibility.
 - Otherwise, model artifacts default to `outputs/models/`.
+
+## Jetson TensorRT Deployment
+
+The NoisyDroneRFv2 model has a documented edge-inference path:
+
+```text
+Keras model -> ONNX export -> TensorRT FP16 engine -> Jetson inference -> trtexec benchmark -> Nsight Systems profile
+```
+
+Current Jetson validation:
+
+| Check | Result |
+|---|---:|
+| TensorRT `trtexec` mean latency | 79.0 ms |
+| TensorRT `trtexec` throughput | 12.58 qps |
+| Direct TensorRT class validation | 7/7 classes matched |
+| Nsight Systems profile | Captured and summarized |
+
+See:
+
+- [Jetson TensorRT deployment guide](docs/jetson_tensorrt_deployment.md)
+- [Jetson TensorRT benchmark/profile summary](results/benchmarks/noisy_drone_tensorrt_jetson.md)
 
 ## Testing
 
