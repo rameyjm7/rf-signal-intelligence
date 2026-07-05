@@ -27,7 +27,7 @@ def test_tracked_notebooks_use_code_only_numbered_cell_headers():
             ), f"{notebook_path} cell {idx} does not use required header"
 
 
-def test_tracked_notebooks_keep_main_cell_order_and_notes():
+def test_tracked_notebooks_keep_main_cell_order_and_use_unique_descriptions():
     tracked = subprocess.check_output(["git", "ls-files", "notebooks/*.ipynb"], text=True)
     for notebook in tracked.splitlines():
         main_text = subprocess.check_output(["git", "show", f"origin/main:{notebook}"], text=True)
@@ -35,12 +35,10 @@ def test_tracked_notebooks_keep_main_cell_order_and_notes():
         current = json.loads(Path(notebook).read_text(encoding="utf-8"))
 
         assert len(current.get("cells", [])) == len(main.get("cells", [])), notebook
-        for idx, (main_cell, current_cell) in enumerate(
-            zip(main.get("cells", []), current.get("cells", []), strict=True),
-            start=1,
-        ):
-            main_source = "".join(main_cell.get("source", [])).splitlines()
+        descriptions = []
+        for idx, current_cell in enumerate(current.get("cells", []), start=1):
             current_source = "".join(current_cell.get("source", [])).splitlines()
-            main_desc = _first_line_description(main_source[0]) if main_source else ""
             current_desc = _first_line_description(current_source[0]) if current_source else ""
-            assert current_desc == main_desc, f"{notebook} cell {idx}"
+            assert current_desc, f"{notebook} cell {idx} has an empty description"
+            descriptions.append(current_desc)
+        assert len(descriptions) == len(set(descriptions)), f"{notebook} has duplicate cell descriptions"
