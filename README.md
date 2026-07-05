@@ -266,6 +266,12 @@ pip install -e ".[dev,test]"
 pre-commit install
 ```
 
+For NoisyDroneRFv2 `.pt` dataset evaluation:
+
+```bash
+pip install -e ".[noisy-drone]"
+```
+
 For GPU-focused environments (Linux):
 
 ```bash

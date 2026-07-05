@@ -149,7 +149,13 @@ def extract_iq_payload(value: Any, *, source: str | Path = "<memory>") -> Any:
 def load_pt_iq(filepath: str | Path) -> np.ndarray:
     """Load a NoisyDroneRFv2 Torch `.pt` IQ file as an `(n, 2)` float32 array."""
     path = Path(filepath)
-    import torch
+    try:
+        import torch
+    except ModuleNotFoundError as exc:
+        raise ModuleNotFoundError(
+            "Loading NoisyDroneRFv2 .pt files requires torch. "
+            'Install it with `pip install -e ".[noisy-drone]"` from the repo root.'
+        ) from exc
 
     payload = torch.load(path, map_location="cpu")
     return coerce_iq_array(extract_iq_payload(payload, source=path), source=path)
