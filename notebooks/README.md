@@ -6,6 +6,12 @@ Notebook execution order and naming convention:
 - `40_*`: dataset-specific evaluation
 - `50_*`: cross-model comparison
 
+Notebook convention:
+
+- Keep notebooks as thin orchestration and visualization layers.
+- Put reusable dataset loading, feature extraction, evaluation, and artifact-writing code under `src/rf_signal_intelligence/`.
+- Prefer the `rfsi` CLI for reproducible runs that should not require opening a notebook.
+
 Current notebooks:
 
 - `10_download_data.ipynb`
@@ -24,9 +30,9 @@ Current notebooks:
 
 Notes for Noisy Drone RF v2:
 
-- `33_vgg_spectrogram_noisy_drone_rf_v2.ipynb` trains/evaluates the VGG full-complex spectrogram model.
-- `44_evaluation_noisy_drone_rf_v2.ipynb` is eval-only for the canonical VGG model.
-- `50_evaluation_comparison.ipynb` has a dedicated Noisy Drone RF v2 eval-only cell, then a final comparison cell.
+- `33_vgg_spectrogram_noisy_drone_rf_v2.ipynb` documents the reusable VGG full-complex spectrogram workflow and CLI commands.
+- `44_evaluation_noisy_drone_rf_v2.ipynb` calls the reusable eval workflow for the canonical VGG model.
+- `50_evaluation_comparison.ipynb` calls the reusable cross-dataset comparison workflow.
 - Saved result artifacts live in `outputs/noisy_drone_rf_v2_eval/` and `outputs/50_evaluation_comparison/`; notebooks should stay cleared before commit.
 
 Notes for `31_lstm_rml2018.ipynb`:

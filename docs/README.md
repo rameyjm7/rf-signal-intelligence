@@ -51,9 +51,24 @@ Initial experiments with a Spectral Transformer using I/Q patches as tokens.
 These documents serve as the reference material for the experiments and architectures found in:
 
 - notebooks/
-- src/ml_wireless_classification/
+- src/rf_signal_intelligence/
 - models/
 - docker/
 
 They describe the theoretical and experimental motivations underlying the models and pipelines implemented in this repository.
 
+## Model And Dataset Cards
+
+Model cards:
+
+- [NoisyDroneRFv2 VGG full-complex spectrogram](model_cards/noisy_drone_rf_v2_vgg.md)
+- [RML2016 CNN-transformer](model_cards/rml2016_cnn_transformer.md)
+- [RML2018 LSTM](model_cards/rml2018_lstm.md)
+- [DeepRadar2022 CNN-transformer](model_cards/deepradar2022_cnn_transformer.md)
+
+Dataset cards:
+
+- [Noisy Drone RF Signal Classification v2](dataset_cards/noisy_drone_rf_v2.md)
+- [RML2016.10A](dataset_cards/rml2016.md)
+- [RML2018.01A](dataset_cards/rml2018.md)
+- [DeepRadar2022](dataset_cards/deepradar2022.md)

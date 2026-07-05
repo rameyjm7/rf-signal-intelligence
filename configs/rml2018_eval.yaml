@@ -1,0 +1,19 @@
+workflow: rml2018_eval
+project_root: .
+outputs_dir: outputs/rml2018_eval
+random_state: 42
+
+dataset:
+  hdf5: /scratch/rameyjm7/datasets/RML2018/GOLD_XYZ_OSC.0001_1024.hdf5
+  classes: /scratch/rameyjm7/datasets/RML2018/classes.txt
+  snr_min_db: -6
+  snr_max_db: 30
+  max_samples_per_class: 3000
+
+model:
+  id: rml2018_lstm_rnn
+  checkpoint: models/rml2018/rml2018_lstm_rnn.keras
+
+evaluation:
+  test_size: 0.20
+  max_per_class_per_snr: 200

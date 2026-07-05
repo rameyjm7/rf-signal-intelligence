@@ -1,0 +1,8 @@
+"""Compatibility wrapper for archived ensemble notebook imports.
+
+The legacy import target now lives in `rf_signal_intelligence.legacy`.
+"""
+
+from rf_signal_intelligence.legacy.rnn_lstm_w_snr_ensemble import ModulationLSTMClassifier
+
+__all__ = ["ModulationLSTMClassifier"]
