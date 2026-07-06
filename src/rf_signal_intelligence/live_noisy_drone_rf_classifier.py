@@ -51,6 +51,24 @@ DEFAULT_BANDWIDTH = 20e6
 DEFAULT_TX_DATASET_DIR = Path("/data/rameyjm7/datasets/NoisyDroneRFv2")
 DEFAULT_TX_CLASS_NAME = "FutabaT14"
 DEFAULT_TX_MIN_SNR = 20
+DEFAULT_GAN_GENERATOR_PATHS = (
+    PROJECT_ROOT
+    / "models"
+    / "noisy_drone_rf_v2"
+    / "noisy_drone_rf_v2_conditional_iq_generator_teacher_aligned_repaired.keras",
+    PROJECT_ROOT
+    / "models"
+    / "noisy_drone_rf_v2"
+    / "noisy_drone_rf_v2_conditional_iq_generator_teacher_aligned_cell10.keras",
+    PROJECT_ROOT
+    / "models"
+    / "noisy_drone_rf_v2"
+    / "noisy_drone_rf_v2_conditional_iq_generator_teacher_aligned.keras",
+    PROJECT_ROOT
+    / "models"
+    / "noisy_drone_rf_v2"
+    / "noisy_drone_rf_v2_conditional_iq_generator.keras",
+)
 NOISY_DRONE_SAMPLE_RE = re.compile(
     r"IQdata_sample(?P<sample>\d+)_target(?P<target>-?\d+)_snr(?P<snr>-?\d+)\.pt$"
 )
@@ -615,6 +633,56 @@ def choose_tx_sample(
     return path, load_iq_file(path)
 
 
+def resolve_gan_generator_path(path: Path | None) -> Path:
+    if path is not None:
+        if not path.exists():
+            raise FileNotFoundError(f"Missing GAN generator: {path}")
+        return path
+    for candidate in DEFAULT_GAN_GENERATOR_PATHS:
+        if candidate.exists():
+            return candidate
+    candidates = "\n  ".join(str(item) for item in DEFAULT_GAN_GENERATOR_PATHS)
+    raise FileNotFoundError(f"Missing GAN generator. Pass --tx-gan-generator. Checked:\n  {candidates}")
+
+
+def infer_generator_latent_dim(generator) -> int:
+    input_shape = generator.input_shape
+    shapes = input_shape if isinstance(input_shape, list) else [input_shape]
+    for shape in shapes:
+        if shape is None or len(shape) < 2:
+            continue
+        last_dim = shape[-1]
+        if last_dim is not None and int(last_dim) > 1:
+            return int(last_dim)
+    raise ValueError(f"Could not infer GAN latent dimension from input_shape={generator.input_shape!r}")
+
+
+def generate_gan_iq(
+    generator,
+    *,
+    class_idx: int,
+    seed: int | None,
+    samples: int,
+    batch_size: int,
+) -> np.ndarray:
+    samples = max(1, int(samples))
+    latent_dim = infer_generator_latent_dim(generator)
+    rng = np.random.default_rng(seed)
+    labels_np = np.full(samples, int(class_idx), dtype=np.int32)
+    z = rng.standard_normal((samples, latent_dim)).astype(np.float32)
+
+    try:
+        fake_iq = generator.predict({"noise": z, "label": labels_np}, batch_size=batch_size, verbose=0)
+    except Exception:
+        fake_iq = generator.predict([z, labels_np], batch_size=batch_size, verbose=0)
+
+    fake_iq = np.asarray(fake_iq, dtype=np.float32)
+    if fake_iq.ndim != 3 or fake_iq.shape[-1] != 2:
+        raise ValueError(f"Expected generated I/Q shaped (N, T, 2), got {fake_iq.shape}")
+    pieces = [coerce_iq_array(fake_iq[idx]) for idx in range(fake_iq.shape[0])]
+    return np.concatenate(pieces, axis=0).astype(np.float32, copy=False)
+
+
 def describe_noisy_drone_sample(path: Path) -> str:
     match = NOISY_DRONE_SAMPLE_RE.search(path.name)
     if not match:
@@ -916,6 +984,18 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--cooldown-sec", type=float, default=1.0)
     parser.add_argument("--tx", action="store_true", help="Transmit a dataset IQ sample before receiving/classifying.")
+    parser.add_argument(
+        "--tx-gan",
+        action="store_true",
+        help="Generate class-conditioned raw I/Q with the 63b GAN and transmit that instead of a dataset sample.",
+    )
+    parser.add_argument(
+        "--tx-gan-generator",
+        type=Path,
+        help="Keras generator path for --tx-gan. Defaults to the best available NoisyDroneRFv2 conditional I/Q GAN.",
+    )
+    parser.add_argument("--tx-gan-samples", type=int, default=256, help="Generated GAN windows to concatenate for TX.")
+    parser.add_argument("--tx-gan-batch-size", type=int, default=32, help="GAN generation batch size.")
     parser.add_argument("--tx-device-args", default=DEFAULT_TX_DEVICE_ARGS, help="SoapySDR TX device args.")
     parser.add_argument("--tx-channel", type=int, default=0, help="Soapy TX channel. For bladeRF, TX1 is channel 0.")
     parser.add_argument("--tx-antenna", default="TX", help="Soapy TX antenna name to select when available.")
@@ -1590,8 +1670,16 @@ def main() -> int:
         args.decision_mode = "non-noise"
     if args.tx_test_all_classes:
         return run_tx_class_sweep(args)
+    if args.tx_gan:
+        args.tx = True
     if args.tx and args.iq_file is not None:
         print("--tx cannot be combined with --iq-file RX replay.", file=sys.stderr)
+        return 2
+    if args.tx_gan and args.tx_iq_file is not None:
+        print("--tx-gan cannot be combined with --tx-iq-file.", file=sys.stderr)
+        return 2
+    if args.tx_gan and args.tx_target is not None and not 0 <= int(args.tx_target) < len(LABEL_NAMES):
+        print(f"--tx-target must be between 0 and {len(LABEL_NAMES) - 1}.", file=sys.stderr)
         return 2
     if not args.model.exists():
         print(f"Missing model: {args.model}", file=sys.stderr)
@@ -1610,14 +1698,33 @@ def main() -> int:
     tx_worker: TxWorker | None = None
     source: FileIqSource | SoapyIqSource | None = None
     if args.tx:
-        tx_path, tx_iq = choose_tx_sample(
-            args.tx_dataset_dir,
-            args.tx_iq_file,
-            seed=args.tx_seed,
-            min_snr=args.tx_min_snr,
-            target=args.tx_target,
-            class_name=args.tx_class_name,
-        )
+        if args.tx_gan:
+            generator_path = resolve_gan_generator_path(args.tx_gan_generator)
+            generator = load_model(generator_path, compile=False)
+            tx_target = args.tx_target if args.tx_target is not None else LABEL_NAMES.index(args.tx_class_name)
+            tx_iq = generate_gan_iq(
+                generator,
+                class_idx=tx_target,
+                seed=args.tx_seed,
+                samples=args.tx_gan_samples,
+                batch_size=args.tx_gan_batch_size,
+            )
+            tx_path = generator_path
+            args.tx_class_name = LABEL_NAMES[tx_target]
+            print(
+                f"TX GAN: generator={generator_path} class={args.tx_class_name} "
+                f"target={tx_target} generated_windows={args.tx_gan_samples} raw_samples={len(tx_iq)}",
+                flush=True,
+            )
+        else:
+            tx_path, tx_iq = choose_tx_sample(
+                args.tx_dataset_dir,
+                args.tx_iq_file,
+                seed=args.tx_seed,
+                min_snr=args.tx_min_snr,
+                target=args.tx_target,
+                class_name=args.tx_class_name,
+            )
         tx_label, tx_confidence, tx_probs = classify_iq(
             model,
             tx_iq,
@@ -1634,7 +1741,10 @@ def main() -> int:
             pad_seconds=args.tx_pad_sec,
             sample_rate=args.sample_rate,
         )
-        print(f"TX sample: {describe_noisy_drone_sample(tx_path)}", flush=True)
+        if args.tx_gan:
+            print(f"TX sample: GAN synthetic {args.tx_class_name} from {tx_path.name}", flush=True)
+        else:
+            print(f"TX sample: {describe_noisy_drone_sample(tx_path)}", flush=True)
         print(
             f"TX file model prediction={tx_label} confidence={tx_confidence:.3f} "
             f"best_non_noise={tx_non_noise_label} non_noise_confidence={tx_non_noise_confidence:.3f}",

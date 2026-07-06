@@ -1,0 +1,22 @@
+#!/usr/bin/env python3
+"""Continuously transmit NoisyDroneRFv2-like signals from a selected SDR."""
+
+from __future__ import annotations
+
+import sys
+from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+SRC_ROOT = PROJECT_ROOT / "src"
+if str(SRC_ROOT) not in sys.path:
+    sys.path.insert(0, str(SRC_ROOT))
+
+
+def main() -> int:
+    from rf_signal_intelligence.noisy_drone_signal_generator import main as generator_main
+
+    return generator_main()
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
