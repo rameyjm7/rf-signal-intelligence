@@ -21,6 +21,8 @@ dependencies = [
   "scipy",
   "PyWavelets",
   "PyYAML",
+  "requests",
+  "websocket-client",
 ]
 
 [project.optional-dependencies]
