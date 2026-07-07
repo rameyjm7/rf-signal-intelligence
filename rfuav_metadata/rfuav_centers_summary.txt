@@ -1,0 +1,254 @@
+RFUAV center-frequency summary by Drone
+========================================
+
+DAUTEL EVO NANO
+  clips: 13
+  center frequencies MHz: {'5770': 13}
+  sample rate Hz min/max: 100000000.0 / 100000000.0
+  IF bandwidth Hz min/max: 100000000.0 / 100000000.0
+  SNR dB min/max: 34.0 / 34.0
+
+DEVENTION DEVO
+  clips: 6
+  center frequencies MHz: {'2440': 6}
+  sample rate Hz min/max: 100000000.0 / 100000000.0
+  IF bandwidth Hz min/max: 100000000.0 / 100000000.0
+  SNR dB min/max: 15.0 / 15.0
+
+DJI AVATA2
+  clips: 44
+  center frequencies MHz: {'5760': 35, '5765': 9}
+  sample rate Hz min/max: 100000000.0 / 100000000.0
+  IF bandwidth Hz min/max: 100000000.0 / 100000000.0
+  SNR dB min/max: 1.0 / 23.0
+
+DJI FPV COMBO
+  clips: 38
+  center frequencies MHz: {'5760': 38}
+  sample rate Hz min/max: 100000000.0 / 100000000.0
+  IF bandwidth Hz min/max: 100000000.0 / 100000000.0
+  SNR dB min/max: 20.0 / 32.0
+
+DJI MAVIC 3 PRO
+  clips: 18
+  center frequencies MHz: {'5800': 18}
+  sample rate Hz min/max: 100000000.0 / 100000000.0
+  IF bandwidth Hz min/max: 100000000.0 / 100000000.0
+  SNR dB min/max: 6.0 / 22.0
+
+DJI MINI 3
+  clips: 9
+  center frequencies MHz: {'2470': 9}
+  sample rate Hz min/max: 100000000.0 / 100000000.0
+  IF bandwidth Hz min/max: 100000000.0 / 100000000.0
+  SNR dB min/max: 21.0 / 36.0
+
+DJI MINI4 PRO
+  clips: 14
+  center frequencies MHz: {'2450': 14}
+  sample rate Hz min/max: 100000000.0 / 100000000.0
+  IF bandwidth Hz min/max: 100000000.0 / 100000000.0
+  SNR dB min/max: 29.0 / 31.0
+
+FLY SKY EL18
+  clips: 7
+  center frequencies MHz: {'2440': 7}
+  sample rate Hz min/max: 100000000.0 / 100000000.0
+  IF bandwidth Hz min/max: 100000000.0 / 100000000.0
+  SNR dB min/max: 27.0 / 27.0
+
+FLY SKY FS I6X
+  clips: 6
+  center frequencies MHz: {'2440': 6}
+  sample rate Hz min/max: 100000000.0 / 100000000.0
+  IF bandwidth Hz min/max: 100000000.0 / 100000000.0
+  SNR dB min/max: 30.0 / 30.0
+
+FLYSKY NV I4
+  clips: 6
+  center frequencies MHz: {'2440': 6}
+  sample rate Hz min/max: 100000000.0 / 100000000.0
+  IF bandwidth Hz min/max: 100000000.0 / 100000000.0
+  SNR dB min/max: 33.0 / 33.0
+
+FLYSKY X14
+  clips: 7
+  center frequencies MHz: {'2440': 7}
+  sample rate Hz min/max: 100000000.0 / 100000000.0
+  IF bandwidth Hz min/max: 100000000.0 / 100000000.0
+  SNR dB min/max: 42.0 / 42.0
+
+FLYSKY X20R
+  clips: 7
+  center frequencies MHz: {'2440': 7}
+  sample rate Hz min/max: 100000000.0 / 100000000.0
+  IF bandwidth Hz min/max: 100000000.0 / 100000000.0
+  SNR dB min/max: 23.0 / 23.0
+
+FLYSKY X9DP2019
+  clips: 6
+  center frequencies MHz: {'2440': 6}
+  sample rate Hz min/max: 100000000.0 / 100000000.0
+  IF bandwidth Hz min/max: 100000000.0 / 100000000.0
+  SNR dB min/max: 40.0 / 40.0
+
+FUTABA T10J
+  clips: 7
+  center frequencies MHz: {'2440': 7}
+  sample rate Hz min/max: 100000000.0 / 100000000.0
+  IF bandwidth Hz min/max: 100000000.0 / 100000000.0
+  SNR dB min/max: 18.0 / 18.0
+
+FUTABA T14SG
+  clips: 8
+  center frequencies MHz: {'2440': 8}
+  sample rate Hz min/max: 100000000.0 / 100000000.0
+  IF bandwidth Hz min/max: 100000000.0 / 100000000.0
+  SNR dB min/max: 24.0 / 25.0
+
+FUTABA T16IZ
+  clips: 7
+  center frequencies MHz: {'2440': 7}
+  sample rate Hz min/max: 100000000.0 / 100000000.0
+  IF bandwidth Hz min/max: 100000000.0 / 100000000.0
+  SNR dB min/max: 38.0 / 38.0
+
+FUTABA T18SZ
+  clips: 7
+  center frequencies MHz: {'2440': 7}
+  sample rate Hz min/max: 100000000.0 / 100000000.0
+  IF bandwidth Hz min/max: 100000000.0 / 100000000.0
+  SNR dB min/max: 38.0 / 38.0
+
+Herelink Hx4
+  clips: 8
+  center frequencies MHz: {'2440': 8}
+  sample rate Hz min/max: 100000000.0 / 100000000.0
+  IF bandwidth Hz min/max: 100000000.0 / 100000000.0
+  SNR dB min/max: 15.0 / 15.0
+
+JR PROPO XG14
+  clips: 7
+  center frequencies MHz: {'2440': 7}
+  sample rate Hz min/max: 100000000.0 / 100000000.0
+  IF bandwidth Hz min/max: 100000000.0 / 100000000.0
+  SNR dB min/max: 43.0 / 43.0
+
+JR PROPO XG7
+  clips: 7
+  center frequencies MHz: {'2440': 7}
+  sample rate Hz min/max: 100000000.0 / 100000000.0
+  IF bandwidth Hz min/max: 100000000.0 / 100000000.0
+  SNR dB min/max: 37.0 / 37.0
+
+JUMPER T14
+  clips: 7
+  center frequencies MHz: {'2440': 7}
+  sample rate Hz min/max: 100000000.0 / 100000000.0
+  IF bandwidth Hz min/max: 100000000.0 / 100000000.0
+  SNR dB min/max: 31.0 / 31.0
+
+JUMPER TProV2
+  clips: 7
+  center frequencies MHz: {'2440': 7}
+  sample rate Hz min/max: 100000000.0 / 100000000.0
+  IF bandwidth Hz min/max: 100000000.0 / 100000000.0
+  SNR dB min/max: 35.0 / 35.0
+
+RadioMaster TX16S
+  clips: 7
+  center frequencies MHz: {'2440': 7}
+  sample rate Hz min/max: 100000000.0 / 100000000.0
+  IF bandwidth Hz min/max: 100000000.0 / 100000000.0
+  SNR dB min/max: 30.0 / 30.0
+
+Radiolink AT10 II
+  clips: 14
+  center frequencies MHz: {'2440': 14}
+  sample rate Hz min/max: 100000000.0 / 100000000.0
+  IF bandwidth Hz min/max: 100000000.0 / 100000000.0
+  SNR dB min/max: 15.0 / 18.0
+
+Radiolink AT9S Pro
+  clips: 8
+  center frequencies MHz: {'2440': 8}
+  sample rate Hz min/max: 100000000.0 / 100000000.0
+  IF bandwidth Hz min/max: 100000000.0 / 100000000.0
+  SNR dB min/max: 14.0 / 14.0
+
+SIYI FT24
+  clips: 7
+  center frequencies MHz: {'2440': 7}
+  sample rate Hz min/max: 100000000.0 / 100000000.0
+  IF bandwidth Hz min/max: 100000000.0 / 100000000.0
+  SNR dB min/max: 28.0 / 28.0
+
+SIYI MK15
+  clips: 8
+  center frequencies MHz: {'2440': 8}
+  sample rate Hz min/max: 100000000.0 / 100000000.0
+  IF bandwidth Hz min/max: 100000000.0 / 100000000.0
+  SNR dB min/max: 46.0 / 46.0
+
+SIYI MK32
+  clips: 6
+  center frequencies MHz: {'2440': 6}
+  sample rate Hz min/max: 100000000.0 / 100000000.0
+  IF bandwidth Hz min/max: 100000000.0 / 100000000.0
+  SNR dB min/max: 50.0 / 50.0
+
+SKYDROID H12
+  clips: 8
+  center frequencies MHz: {'2470': 8}
+  sample rate Hz min/max: 100000000.0 / 100000000.0
+  IF bandwidth Hz min/max: 100000000.0 / 100000000.0
+  SNR dB min/max: 31.0 / 31.0
+
+SKYDROID T10
+  clips: 9
+  center frequencies MHz: {'2470': 9}
+  sample rate Hz min/max: 100000000.0 / 100000000.0
+  IF bandwidth Hz min/max: 100000000.0 / 100000000.0
+  SNR dB min/max: 23.0 / 23.0
+
+WFLY ET10
+  clips: 9
+  center frequencies MHz: {'2440': 9}
+  sample rate Hz min/max: 100000000.0 / 100000000.0
+  IF bandwidth Hz min/max: 100000000.0 / 100000000.0
+  SNR dB min/max: 26.0 / 26.0
+
+WFLY ET16S
+  clips: 8
+  center frequencies MHz: {'2440': 8}
+  sample rate Hz min/max: 100000000.0 / 100000000.0
+  IF bandwidth Hz min/max: 100000000.0 / 100000000.0
+  SNR dB min/max: 29.0 / 29.0
+
+WFLY WFT09SII
+  clips: 8
+  center frequencies MHz: {'2410': 8}
+  sample rate Hz min/max: 100000000.0 / 100000000.0
+  IF bandwidth Hz min/max: 100000000.0 / 100000000.0
+  SNR dB min/max: 35.0 / 35.0
+
+YUNZHUO H12
+  clips: 4
+  center frequencies MHz: {'2440': 4}
+  sample rate Hz min/max: 100000000.0 / 100000000.0
+  IF bandwidth Hz min/max: 100000000.0 / 100000000.0
+  SNR dB min/max: 29.0 / 29.0
+
+YUNZHUO H16
+  clips: 4
+  center frequencies MHz: {'2440': 4}
+  sample rate Hz min/max: 100000000.0 / 100000000.0
+  IF bandwidth Hz min/max: 100000000.0 / 100000000.0
+  SNR dB min/max: 22.0 / 22.0
+
+YUNZHUO H30
+  clips: 4
+  center frequencies MHz: {'2440': 4}
+  sample rate Hz min/max: 100000000.0 / 100000000.0
+  IF bandwidth Hz min/max: 100000000.0 / 100000000.0
+  SNR dB min/max: 14.0 / 14.0
