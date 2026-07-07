@@ -1,35 +1,40 @@
-RF Signal Intelligence Non-Commercial License
+RF Signal Intelligence Non-Commercial Source-Available License
 
-Copyright (c) 2024-2026 Jacob M. Ramey
+Copyright (c) 2024-2026 Jacob Ramey and RTG LLC
 
-This repository's original software, notebooks, scripts, documentation, model
-workflow code, and generated project artifacts authored by Jacob M. Ramey are
-free to use, copy, modify, and distribute for personal, educational, research,
-and other non-commercial purposes.
+All commercial rights are reserved by Jacob Ramey and RTG LLC.
 
-Commercialization Rights Reserved
+Permission is granted to use, copy, modify, and distribute the original software,
+scripts, notebooks, documentation, configuration, model workflow code, and
+project-authored artifacts in this repository for personal, educational,
+research, evaluation, and other non-commercial purposes only.
 
-Jacob M. Ramey and/or RTG LLC retain the exclusive right to commercialize this
-work. Commercial use, sale, sublicensing, paid deployment, commercial hosting,
-integration into commercial products or services, or other revenue-generating use
-requires prior written permission from Jacob M. Ramey or RTG LLC.
+Commercial use requires prior written permission from Jacob Ramey or RTG LLC.
+Commercial use includes, but is not limited to, sale, sublicensing, paid
+deployment, commercial hosting, integration into commercial products or
+services, contract deliverables, internal commercial operations, managed service
+offerings, or other revenue-generating use.
 
-For commercial licensing or permission requests, contact:
+Commercial licensing, integration, support, or permission inquiries:
 
-Jacob M. Ramey
-rameyjm7@gmail.com
-jake.rtgllc@gmail.com
+- Jacob Ramey: rameyjm7@gmail.com
+- RTG LLC: jake.rtgllc@gmail.com
 
-Third-Party Datasets And Artifacts
+Third-Party Materials
 
-This license applies only to original work in this repository. It does not grant
-ownership of, or additional rights to, third-party datasets, pretrained external
-artifacts, or source materials used by the project.
+This license applies only to original work authored for this repository. Jacob
+Ramey and RTG LLC make no claim of ownership over third-party datasets,
+pretrained models, dependencies, SDR drivers, vendor software, protocol
+specifications, sample captures, or other externally sourced materials
+referenced, used with, or required by this repository.
 
-In particular, Jacob M. Ramey and RTG LLC do not claim ownership of datasets
-provided by DeepSig, including RadioML datasets, or any other third-party dataset
-referenced by this repository. Those datasets remain subject to their original
-owners' licenses, terms, and redistribution restrictions.
+Third-party materials remain subject to their own licenses, terms, attribution
+requirements, redistribution restrictions, export controls, and usage limits. In
+particular, datasets such as NoisyDroneRF, RFUAV, DeepSig RadioML, RML2016,
+RML2018, DeepRadar2022, and any other external dataset referenced by this
+repository remain owned and governed by their original rights holders and terms.
+It is each user's responsibility to verify that their use of any third-party
+material is permitted.
 
 No Warranty
 
