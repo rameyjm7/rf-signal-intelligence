@@ -1,0 +1,14 @@
+[
+  {
+    "condition": "background_2470_no_drone",
+    "events": 30,
+    "alerts": 0,
+    "no_alerts": 30,
+    "alert_rate_pct": 0.0,
+    "max_non_noise_confidence": 0.9404623498007182,
+    "mean_spectral_snr_db": 14.102643524720456,
+    "mean_end_to_end_ms": 363.18549846764654,
+    "mean_inference_ms": 124.01764109866538,
+    "top_predictions": "Noise:30"
+  }
+]

@@ -1,0 +1,2 @@
+condition,events,alerts,no_alerts,alert_rate_pct,max_non_noise_confidence,mean_spectral_snr_db,mean_end_to_end_ms,mean_inference_ms,top_predictions
+background_2470_no_drone,30,0,30,0.0,0.9404623498007182,14.102643524720456,363.18549846764654,124.01764109866538,Noise:30
