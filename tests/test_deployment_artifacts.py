@@ -73,6 +73,8 @@ def test_gateway_rx_classifier_exposes_jetson_event_flags():
         "--backend",
         "--engine",
         "--continuous",
+        "--duration-sec",
+        "--max-reports",
         "--event-jsonl",
         "--run-id",
         "event-json",
