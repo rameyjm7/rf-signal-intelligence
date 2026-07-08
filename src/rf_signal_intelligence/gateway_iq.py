@@ -161,7 +161,7 @@ class GatewayIqSource:
                 pass
             self.stream_id = None
 
-    def __enter__(self) -> "GatewayIqSource":
+    def __enter__(self) -> GatewayIqSource:
         return self
 
     def __exit__(self, *_exc: object) -> None:

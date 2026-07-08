@@ -8,8 +8,8 @@ windows, and select the best candidate using a target or non-noise score.
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Callable
 
 import numpy as np
 
@@ -20,14 +20,13 @@ from rf_signal_intelligence.features.spectrogram import (
 from rf_signal_intelligence.live_noisy_drone_rf_classifier import (
     LABEL_NAMES,
     best_non_noise_prediction,
-    capture_stats,
     candidate_window_starts,
+    capture_stats,
     choose_final_prediction,
     coerce_iq_array,
     conditional_class_confidence,
     select_high_power_window,
 )
-
 
 PredictBatch = Callable[[np.ndarray], np.ndarray]
 
