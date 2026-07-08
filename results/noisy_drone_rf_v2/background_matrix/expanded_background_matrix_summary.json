@@ -1,0 +1,50 @@
+[
+  {
+    "condition": "wifi_heavy_2412_no_drone",
+    "events": 30,
+    "alerts": 0,
+    "no_alerts": 30,
+    "alert_rate_pct": 0.0,
+    "max_non_noise_confidence": 0.9993899607975889,
+    "mean_spectral_snr_db": 10.634801790828769,
+    "mean_end_to_end_ms": 366.0692017331409,
+    "mean_inference_ms": 122.80865770396001,
+    "top_predictions": "Noise:30"
+  },
+  {
+    "condition": "bluetooth_heavy_2402_no_drone",
+    "events": 30,
+    "alerts": 0,
+    "no_alerts": 30,
+    "alert_rate_pct": 0.0,
+    "max_non_noise_confidence": 0.980745740347306,
+    "mean_spectral_snr_db": 10.549810190996956,
+    "mean_end_to_end_ms": 358.8541048297581,
+    "mean_inference_ms": 124.52370693596701,
+    "top_predictions": "Noise:30"
+  },
+  {
+    "condition": "random_2440_no_drone",
+    "events": 30,
+    "alerts": 0,
+    "no_alerts": 30,
+    "alert_rate_pct": 0.0,
+    "max_non_noise_confidence": 0.9915859131061904,
+    "mean_spectral_snr_db": 11.321287404758273,
+    "mean_end_to_end_ms": 358.93241306281806,
+    "mean_inference_ms": 122.69296923380655,
+    "top_predictions": "Noise:30"
+  },
+  {
+    "condition": "soak_2470_no_drone",
+    "events": 150,
+    "alerts": 0,
+    "no_alerts": 150,
+    "alert_rate_pct": 0.0,
+    "max_non_noise_confidence": 0.974172552111491,
+    "mean_spectral_snr_db": 12.191658211245876,
+    "mean_end_to_end_ms": 350.8064978913171,
+    "mean_inference_ms": 122.42145363454863,
+    "top_predictions": "Noise:150"
+  }
+]
