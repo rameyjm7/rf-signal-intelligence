@@ -2,9 +2,15 @@
 
 This page documents the first-class deployment path for the NoisyDroneRFv2 RF classifier.
 
+The public repository does not include pretrained Keras weights, ONNX exports,
+TensorRT engines, calibration samples, or production deployment artifacts. Paths
+in this guide are expected to point to locally trained, private, or separately
+licensed artifacts.
+
 ## Target Model
 
-Use the best NoisyDroneRFv2 VGG full-complex spectrogram checkpoint:
+Use a locally trained, private, or licensed NoisyDroneRFv2 VGG full-complex
+spectrogram checkpoint:
 
 ```text
 models/noisy_drone_rf_v2/noisy_drone_rf_v2_vgg_full_complex_spectrogram_best.keras

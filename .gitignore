@@ -16,3 +16,26 @@ code.tar.gz
 models/**/checkpoints/
 configs/local_data_paths.yaml
 results/**/iq/*.npy
+
+# Public repo artifact policy: keep trained models, exported engines, and raw IQ
+# captures in private storage or local/private repos.
+*.keras
+*.h5
+*.hdf5
+*.onnx
+*.engine
+*.pt
+*.pth
+*.ckpt
+*.npy
+*.npz
+*.bin
+*.c64
+*.iq
+*.sigmf-data
+*.sigmf-meta
+models/**/*.json
+!models/noisy_drone_rf_v2/labels.json
+results/**/*.jsonl
+results/**/*.log
+results/**/replay_manifest.json

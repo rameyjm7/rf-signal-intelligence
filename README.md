@@ -174,6 +174,9 @@ Evaluation and deployment references:
 ## CLI Workflows
 
 The preferred workflow is the `rfsi` CLI plus pipeline scripts that call reusable code under `src/`.
+Model paths in the examples below refer to local/private artifacts that you
+train yourself or license separately; pretrained weights and exported engines
+are intentionally not included in this public repository.
 
 ```bash
 # Train or continue the canonical NoisyDroneRFv2 VGG spectrogram model.
@@ -198,12 +201,16 @@ rfsi export-onnx \
 Run the exported ONNX model locally on CPU:
 
 ```bash
+ONNX_MODEL=/path/to/private/model.onnx \
+SAMPLE_INPUT=/path/to/private/sample_input.npy \
 models/noisy_drone_rf_v2/run_onnx_inference.sh --providers CPUExecutionProvider
 ```
 
 Run one high-SNR dataset sample per class:
 
 ```bash
+ONNX_MODEL=/path/to/private/model.onnx \
+SAMPLE_INPUT=/path/to/private/sample_input.npy \
 models/noisy_drone_rf_v2/run_onnx_inference.sh \
   --class-sweep \
   --dataset-dir /data/rameyjm7/datasets/NoisyDroneRFv2 \
@@ -352,7 +359,12 @@ See [docker/README.md](docker/README.md) for Docker Hub and Apptainer/HPC usage.
 
 ## Notes
 
-- Large datasets and model artifacts are expected; this repository is data-heavy.
+- This public repository intentionally excludes trained model weights, TensorRT
+  engines, ONNX exports, private calibration data, raw IQ captures, and
+  production deployment artifacts.
+- Use the provided workflows to train/export your own models, or contact Jacob
+  Ramey / RTG LLC to license validated model artifacts and commercial
+  integrations.
 - Public dataset results are not equivalent to live field collection.
 - Release/tag process is documented in `RELEASE.md`.
 

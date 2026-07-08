@@ -16,7 +16,7 @@ Demonstrate proposal-ready NoisyDroneRF classification coverage by replaying rep
 
 ## Method
 
-The session ran no-TX baseline, six class-specific OTA replay phases, and no-TX recovery. Each report emitted JSONL and saved received IQ for regression replay.
+The session ran no-TX baseline, six class-specific OTA replay phases, and no-TX recovery. Detailed replay captures and machine-readable event logs are retained privately for regression use.
 
 ## Metrics
 
@@ -37,12 +37,10 @@ Aggregate: 24/24 reports matched expected behavior; 18/18 positive controls were
 
 - Controlled OTA replay of labeled dataset IQ, not live flight testing with physical controllers.
 - The result validates this deployed RF chain and gating configuration at 2470 MHz / 20 MHz.
-- Raw IQ evidence is local and ignored by Git due to size.
+- Raw IQ evidence and replay manifests are retained outside the public repository.
 
 ## Artifacts
 
 - `results/noisy_drone_rf_v2/multiclass_pc_20260708T145502Z/proposal_report.md`
 - `results/noisy_drone_rf_v2/multiclass_pc_20260708T145502Z/proposal_table.csv`
-- `results/noisy_drone_rf_v2/multiclass_pc_20260708T145502Z/event_level_results.csv`
-- `results/noisy_drone_rf_v2/multiclass_pc_20260708T145502Z/replay_manifest.json`
-- Local replay IQ: `results/noisy_drone_rf_v2/multiclass_pc_20260708T145502Z/*/iq/*.npy`
+- Private regression archive: replay manifest, event logs, TX/RX logs, and received IQ captures.
