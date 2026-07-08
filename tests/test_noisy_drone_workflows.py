@@ -13,6 +13,11 @@ from rf_signal_intelligence.features.spectrogram import (
     find_burst_start,
     iq_to_full_complex_spectrogram,
 )
+from rf_signal_intelligence.noisy_drone_framing import (
+    NoisyDroneFrameConfig,
+    build_model_windows,
+    frequency_shift_iq,
+)
 from rf_signal_intelligence.plots import modulation_accuracy_traces_by_snr
 from rf_signal_intelligence.workflows.comparison import comparison_row
 from rf_signal_intelligence.workflows.noisy_drone_vgg import (
@@ -70,6 +75,63 @@ def test_find_burst_start_centers_high_power_region():
     start = find_burst_start(iq, 20, smooth_samples=1)
 
     assert 60 <= start <= 70
+
+
+def test_noisy_drone_framer_keeps_default_offset_metadata():
+    rng = np.random.default_rng(11)
+    iq = rng.normal(size=(128, 2)).astype(np.float32)
+    config = NoisyDroneFrameConfig(
+        window_samples=128,
+        nfft=32,
+        hop=16,
+        time_bins=8,
+        scan_windows=False,
+    )
+
+    windows, candidates, raw_iq = build_model_windows(iq, config)
+
+    assert windows.shape == (1, 32, 8, 2)
+    assert candidates == [{"start": 0, "frequency_offset_hz": 0.0}]
+    assert raw_iq.shape == (128, 2)
+
+
+def test_noisy_drone_framer_expands_frequency_offset_candidates():
+    rng = np.random.default_rng(12)
+    iq = rng.normal(size=(256, 2)).astype(np.float32)
+    config = NoisyDroneFrameConfig(
+        window_samples=128,
+        nfft=32,
+        hop=16,
+        time_bins=8,
+        scan_stride_samples=64,
+        sample_rate_hz=20_000_000,
+        frequency_offsets_hz=(-1_000_000.0, 0.0, 1_000_000.0),
+    )
+
+    windows, candidates, _ = build_model_windows(iq, config)
+    starts = sorted({candidate["start"] for candidate in candidates})
+
+    assert windows.shape[0] == len(starts) * 3
+    assert {candidate["frequency_offset_hz"] for candidate in candidates} == {
+        -1_000_000.0,
+        0.0,
+        1_000_000.0,
+    }
+
+
+def test_frequency_shift_iq_preserves_shape_and_changes_nonzero_offsets():
+    iq = np.column_stack(
+        (
+            np.ones(64, dtype=np.float32),
+            np.zeros(64, dtype=np.float32),
+        )
+    )
+
+    shifted = frequency_shift_iq(iq, 1_000_000.0, 20_000_000.0)
+
+    assert shifted.shape == iq.shape
+    assert shifted.dtype == np.float32
+    assert not np.allclose(shifted, iq)
 
 
 def test_comparison_row_reports_model_metadata(tmp_path: Path):
