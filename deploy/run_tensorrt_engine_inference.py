@@ -114,13 +114,16 @@ def shape_has_dynamic_dim(shape: tuple[int, ...]) -> bool:
 
 class TensorRtRunner:
     def __init__(self, engine_path: Path):
-        import tensorrt as trt
         try:
             from cuda import cudart
         except ImportError:
             from cuda.bindings import runtime as cudart
 
         self.cudart = cudart
+        check_cuda(cudart.cudaSetDevice(0), "set CUDA device")
+        check_cuda(cudart.cudaFree(0), "CUDA context initialization")
+        import tensorrt as trt
+
         self.engine = load_engine(engine_path)
         self.context = self.engine.create_execution_context()
         if self.context is None:

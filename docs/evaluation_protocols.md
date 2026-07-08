@@ -10,7 +10,7 @@ This page summarizes the evaluation protocols used across the repo so result row
 | Sample count | Dataset/notebook dependent |
 | SNR range | Full available SNR range |
 | Class balance | Dataset dependent |
-| Train/test split | Notebook/config specific |
+| Train/test split | Pipeline/config specific |
 | Checkpoint used | Best available model for that notebook run |
 | Label mapping rule | Dataset-native class order unless noted |
 | Metric | Accuracy, macro F1, weighted F1 |
@@ -39,7 +39,7 @@ This page summarizes the evaluation protocols used across the repo so result row
 | SNR range | High-SNR slice |
 | Class balance | Balanced |
 | Train/test split | Derived from held-out or notebook-selected slice |
-| Checkpoint used | Notebook/config specific |
+| Checkpoint used | Pipeline/config specific |
 | Label mapping rule | May require explicit class-order calibration |
 | Metric | Accuracy, macro F1, weighted F1 |
 | Comparable to other rows | Only comparable to similarly balanced high-SNR slices |
@@ -49,7 +49,7 @@ This page summarizes the evaluation protocols used across the repo so result row
 | Field | Value |
 |---|---|
 | Dataset | Sampled combination of supported datasets |
-| Sample count | Notebook/config specific |
+| Sample count | Pipeline/config specific |
 | SNR range | Mixed |
 | Class balance | Mixed |
 | Train/test split | Evaluation-only sampled set |

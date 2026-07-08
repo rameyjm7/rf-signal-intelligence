@@ -1,4 +1,4 @@
-"""Plotting and tabular artifact helpers shared by notebooks."""
+"""Plotting and tabular artifact helpers shared by pipelines."""
 
 from __future__ import annotations
 

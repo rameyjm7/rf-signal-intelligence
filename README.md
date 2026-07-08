@@ -31,6 +31,7 @@ public RF datasets -> reusable training/evaluation code -> live SDR replay/recei
 - [Testing](#testing)
 - [Docker](#docker)
 - [Notes](#notes)
+- [Licensing](#licensing)
 - [Citation](#citation)
 
 ## Overview
@@ -44,7 +45,7 @@ Implemented workflows include:
 - Config-driven CLI entrypoints for training, evaluation, comparison, and ONNX export
 - Jetson TensorRT FP16 benchmarking and profiling support
 
-The notebooks remain available as convenient HPC frontends, while maintained workflows live in reusable package code and CLI entrypoints.
+The former notebooks have been converted into versioned Python pipelines under `pipelines/`, while maintained reusable workflow logic lives in package code and CLI entrypoints.
 
 ## Live OTA Noisy Drone Demo
 
@@ -141,7 +142,7 @@ deploy/                           Jetson/TensorRT scripts
 models/                           Saved model artifacts
 outputs/                          Generated local outputs
 results/                          Curated result reports and figures
-notebooks/                        Reproducible notebook frontends
+pipelines/                        Reproducible Python pipeline frontends
 docs/                             Model cards, dataset cards, reports, protocols
 tests/                            Unit and integration tests
 ```
@@ -172,7 +173,7 @@ Evaluation and deployment references:
 
 ## CLI Workflows
 
-The preferred workflow is the `rfsi` CLI plus notebooks that call reusable code under `src/`.
+The preferred workflow is the `rfsi` CLI plus pipeline scripts that call reusable code under `src/`.
 
 ```bash
 # Train or continue the canonical NoisyDroneRFv2 VGG spectrogram model.
@@ -351,6 +352,27 @@ See [docker/README.md](docker/README.md) for Docker Hub and Apptainer/HPC usage.
 - Large datasets and model artifacts are expected; this repository is data-heavy.
 - Public dataset results are not equivalent to live field collection.
 - Release/tag process is documented in `RELEASE.md`.
+
+## Licensing
+
+RF Signal Intelligence is source-available for personal, educational, research,
+evaluation, and other non-commercial use. All commercial rights are retained by
+Jacob Ramey and RTG LLC. Commercial use, paid deployment, commercial hosting,
+integration into commercial products or services, contract deliverables, managed
+service offerings, or other revenue-generating use requires prior written
+permission.
+
+This repository uses and references third-party datasets, models, SDR drivers,
+tools, and protocol materials. Jacob Ramey and RTG LLC make no ownership claim
+over those third-party materials, including NoisyDroneRF, RFUAV, DeepSig
+RadioML, RML2016, RML2018, DeepRadar2022, or any other external dataset. Those
+materials remain subject to their original licenses, terms, and redistribution
+restrictions.
+
+For commercial licensing, integration, support, or permission inquiries, contact:
+
+- Jacob Ramey: rameyjm7@gmail.com
+- RTG LLC: jake.rtgllc@gmail.com
 
 ## Citation
 

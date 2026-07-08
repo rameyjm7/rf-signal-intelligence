@@ -1,4 +1,4 @@
-"""Spectrogram utilities extracted from the NoisyDroneRFv2 notebooks."""
+"""Spectrogram utilities extracted from the NoisyDroneRFv2 pipelines."""
 
 from __future__ import annotations
 

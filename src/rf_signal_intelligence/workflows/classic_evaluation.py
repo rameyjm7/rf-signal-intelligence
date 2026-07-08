@@ -204,5 +204,5 @@ def evaluate_deepradar2022(config: dict[str, Any]) -> dict[str, Any]:
 
 
 def rml2018_class_names(classes_path: str | Path) -> list[str]:
-    """Expose class parsing to notebooks without importing dataset libraries."""
+    """Expose class parsing to pipelines without importing dataset libraries."""
     return parse_classes_file(classes_path)

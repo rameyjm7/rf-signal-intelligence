@@ -12,7 +12,7 @@ import numpy as np
 
 @dataclass(frozen=True)
 class ClassificationMetrics:
-    """Common classification metrics used across notebooks."""
+    """Common classification metrics used across pipelines."""
 
     accuracy: float
     macro_f1: float
