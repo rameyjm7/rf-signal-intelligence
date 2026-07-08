@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# ruff: noqa: E402,I001
 """CLI wrapper for the RML2016 live SDR classifier."""
 
 from __future__ import annotations

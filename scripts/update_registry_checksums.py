@@ -4,23 +4,22 @@
 from __future__ import annotations
 
 import hashlib
+from collections.abc import Mapping
 from pathlib import Path
-from typing import Any
 
 import yaml
-
 
 REPO = Path(__file__).resolve().parents[1]
 DATA_REG = REPO / "configs" / "data_registry.yaml"
 MODEL_REG = REPO / "configs" / "model_registry.yaml"
 
 
-def _load_yaml(path: Path) -> dict[str, Any]:
+def _load_yaml(path: Path) -> dict[str, object]:
     with path.open("r", encoding="utf-8") as handle:
         return yaml.safe_load(handle)
 
 
-def _write_yaml(path: Path, payload: dict[str, Any]) -> None:
+def _write_yaml(path: Path, payload: Mapping[str, object]) -> None:
     with path.open("w", encoding="utf-8") as handle:
         yaml.safe_dump(payload, handle, sort_keys=False)
 
@@ -36,7 +35,7 @@ def _sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
-def _set_checksum(entry: dict[str, Any], path: Path) -> None:
+def _set_checksum(entry: dict[str, object], path: Path) -> None:
     entry.setdefault("checksum", {"algorithm": "sha256", "value": None})
     if path.exists():
         entry["checksum"]["value"] = _sha256(path)
