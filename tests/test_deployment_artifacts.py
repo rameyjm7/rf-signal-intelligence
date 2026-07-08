@@ -75,6 +75,8 @@ def test_gateway_rx_classifier_exposes_jetson_event_flags():
         "--continuous",
         "--duration-sec",
         "--max-reports",
+        "--save-iq-dir",
+        "--min-detection-confidence",
         "--event-jsonl",
         "--run-id",
         "--frequency-offsets-hz",

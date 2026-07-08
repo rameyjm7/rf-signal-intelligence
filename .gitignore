@@ -15,3 +15,4 @@ code.tar.gz
 *.sif
 models/**/checkpoints/
 configs/local_data_paths.yaml
+results/**/iq/*.npy
