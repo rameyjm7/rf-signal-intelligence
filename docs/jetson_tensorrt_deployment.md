@@ -196,6 +196,45 @@ Validated TensorRT FP16 correctness on the Jetson with one preprocessed NoisyDro
 
 Summary: 7/7 expected classes matched using direct TensorRT engine inference.
 
+## 5.1 Run Live Gateway-to-TensorRT Event Demo
+
+Use the gateway RX classifier when the Jetson should prove the complete live
+path, not just a preprocessed TensorRT sample:
+
+```bash
+cd /home/jake/workspace/SDR/rf-signal-intelligence
+/home/jake/workspace/SDR/SDR-Shark/backend/.venv/bin/python \
+  scripts/noisy_drone_gateway_rx_classifier.py \
+  --gateway-url http://127.0.0.1:8080 \
+  --device-id bladerf:0 \
+  --freq 2470000000 \
+  --sample-rate 20000000 \
+  --bandwidth 20000000 \
+  --lna-gain 40 \
+  --vga-gain 50 \
+  --backend tensorrt \
+  --engine models/noisy_drone_rf_v2/noisy_drone_rf_v2_vgg_full_complex_spectrogram_fp16.engine \
+  --labels models/noisy_drone_rf_v2/labels.json \
+  --capture-samples 4194304 \
+  --discard-captures 1 \
+  --window-score-mode raw \
+  --decision-mode hybrid \
+  --min-snr-db 5 \
+  --event-jsonl results/benchmarks/jetson_noisy_drone_events.jsonl \
+  --format event-json \
+  --continuous \
+  --interval-sec 1
+```
+
+This emits one compact JSON event per capture and appends the same event to the
+JSONL artifact. The event includes the SDR source, final prediction, top
+classes, quality gates, selected IQ window, and timing fields for capture read,
+preprocessing, TensorRT inference, decision, quality/gates, classify total, and
+end-to-end latency.
+
+See `results/benchmarks/noisy_drone_jetson_end_to_end_demo.md` for the demo
+checklist and event schema.
+
 For a stronger correctness check, copy one or more preprocessed validation `.npy` files to the Jetson and run:
 
 ```bash

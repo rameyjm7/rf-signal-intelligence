@@ -64,3 +64,20 @@ def test_local_onnx_inference_script_exposes_expected_flags():
         "--format",
     ]:
         assert flag in text
+
+
+def test_gateway_rx_classifier_exposes_jetson_event_flags():
+    text = (REPO_ROOT / "scripts/noisy_drone_gateway_rx_classifier.py").read_text(encoding="utf-8")
+
+    for flag in [
+        "--backend",
+        "--engine",
+        "--continuous",
+        "--event-jsonl",
+        "--run-id",
+        "event-json",
+        "end_to_end",
+        "preprocess",
+        "inference",
+    ]:
+        assert flag in text

@@ -300,6 +300,7 @@ Keras model -> ONNX export -> TensorRT FP16 engine -> Jetson inference -> trtexe
 | TensorRT `trtexec` throughput | 12.58 qps |
 | Direct TensorRT class validation | 7/7 classes matched |
 | Nsight Systems profile | Captured and summarized |
+| Live gateway-to-TensorRT event path | Implemented with JSONL output |
 
 Runtime comparison:
 
@@ -313,6 +314,7 @@ See:
 
 - [Jetson TensorRT deployment guide](docs/jetson_tensorrt_deployment.md)
 - [Jetson TensorRT benchmark/profile summary](results/benchmarks/noisy_drone_tensorrt_jetson.md)
+- [Jetson end-to-end JSON event demo](results/benchmarks/noisy_drone_jetson_end_to_end_demo.md)
 
 ## Testing
 
