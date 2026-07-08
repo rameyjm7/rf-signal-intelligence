@@ -45,7 +45,7 @@ Implemented workflows include:
 - Config-driven CLI entrypoints for training, evaluation, comparison, and ONNX export
 - Jetson TensorRT FP16 benchmarking and profiling support
 
-The notebooks remain available as convenient HPC frontends, while maintained workflows live in reusable package code and CLI entrypoints.
+The former notebooks have been converted into versioned Python pipelines under `pipelines/`, while maintained reusable workflow logic lives in package code and CLI entrypoints.
 
 ## Live OTA Noisy Drone Demo
 
@@ -142,7 +142,7 @@ deploy/                           Jetson/TensorRT scripts
 models/                           Saved model artifacts
 outputs/                          Generated local outputs
 results/                          Curated result reports and figures
-notebooks/                        Reproducible notebook frontends
+pipelines/                        Reproducible Python pipeline frontends
 docs/                             Model cards, dataset cards, reports, protocols
 tests/                            Unit and integration tests
 ```
@@ -173,7 +173,7 @@ Evaluation and deployment references:
 
 ## CLI Workflows
 
-The preferred workflow is the `rfsi` CLI plus notebooks that call reusable code under `src/`.
+The preferred workflow is the `rfsi` CLI plus pipeline scripts that call reusable code under `src/`.
 
 ```bash
 # Train or continue the canonical NoisyDroneRFv2 VGG spectrogram model.

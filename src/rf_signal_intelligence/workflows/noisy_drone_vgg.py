@@ -1,4 +1,4 @@
-"""NoisyDroneRFv2 VGG spectrogram workflows for CLI and notebooks."""
+"""NoisyDroneRFv2 VGG spectrogram workflows for CLI and pipelines."""
 
 from __future__ import annotations
 

@@ -72,7 +72,7 @@ exclude = [
   "data",
   "docs",
   "models",
-  "notebooks",
+  "pipelines",
   "src/rf_signal_intelligence/base",
   "src/rf_signal_intelligence/legacy",
   "src/rf_signal_intelligence/core/base_classifier.py",

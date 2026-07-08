@@ -27,13 +27,13 @@ Canonical model:
 models/noisy_drone_rf_v2/noisy_drone_rf_v2_vgg_full_complex_spectrogram_best.keras
 ```
 
-Notebook flow:
+Pipeline flow:
 
-- `33_vgg_spectrogram_noisy_drone_rf_v2.ipynb`: training/evaluation experiment and baseline artifacts.
-- `44_evaluation_noisy_drone_rf_v2.ipynb`: eval-only notebook for the canonical VGG model.
-- `50_evaluation_comparison.ipynb`: consolidated comparison with a dedicated Noisy Drone RF v2 eval-only cell.
+- `33_vgg_spectrogram_noisy_drone_rf_v2.py`: training/evaluation experiment and baseline artifacts.
+- `44_evaluation_noisy_drone_rf_v2.py`: eval-only pipeline for the canonical VGG model.
+- `50_evaluation_comparison.py`: consolidated comparison with a dedicated Noisy Drone RF v2 eval-only cell.
 
-Current metrics from notebooks `33`, `44`, and `50` agree on the same held-out split configuration: `NOISY_DRONE_MIN_SNR_DB=-6`, `NOISY_DRONE_DATA_FRACTION=0.25`, one eval window.
+Current metrics from pipelines `33`, `44`, and `50` agree on the same held-out split configuration: `NOISY_DRONE_MIN_SNR_DB=-6`, `NOISY_DRONE_DATA_FRACTION=0.25`, one eval window.
 
 | Source | Eval protocol | Accuracy | Macro F1 | Weighted F1 | Samples |
 |---|---|---:|---:|---:|---:|
