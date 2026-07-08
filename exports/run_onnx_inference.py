@@ -151,7 +151,7 @@ def load_model_input(args: argparse.Namespace, *, iq_file: str | Path | None = N
         SpectrogramConfig,
         iq_to_full_complex_spectrogram,
     )
-    from rf_signal_intelligence.live_noisy_drone_rf_classifier import load_iq_file
+    from rf_signal_intelligence.iq_io import load_iq_file
 
     iq = load_iq_file(Path(selected_iq_file))
     if iq.shape[0] < args.window_samples:

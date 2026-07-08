@@ -13,7 +13,7 @@
 
 ## Intended Use
 
-Classify labeled NoisyDroneRFv2-style I/Q captures and demonstrate live RF sensor-processing workflows using file playback, SDR receive, and SDR-to-SDR over-the-air replay.
+Classify labeled NoisyDroneRFv2-style I/Q captures and demonstrate RFML preprocessing, export, and deployment workflows with user-supplied data and models.
 
 This model is appropriate for research demos, reproducible evaluation, and feasibility evidence for RFML classification. It is not a field-validated drone detector and should not be presented as operational coverage against arbitrary real-world emitters.
 
@@ -27,13 +27,13 @@ The two channels are the real and imaginary parts of the complex STFT after FFT 
 
 - Load `.pt` I/Q sample.
 - Coerce to `(samples, 2)` float32 I/Q.
-- Select a high-power burst window with `sample_len=1048576`.
+- Select or provide a fixed-size IQ window with `sample_len=1048576`.
 - Normalize the I/Q window.
 - Compute full-complex STFT with `nfft=1024`, `hop=1024`.
 - Resize/pad time axis to `time_bins=1024`.
 - Normalize spectrogram by standard deviation and clip to `[-6, 6]`.
 
-Live inference uses the same spectrogram shape through `scripts/live_noisy_drone_rf_classifier.py`.
+Live SDR framing and gateway integration are maintained in the private product repository.
 
 ## Classes
 
@@ -66,7 +66,7 @@ Related artifacts:
 
 - `outputs/noisy_drone_rf_v2_eval/44_noisy_drone_rf_v2_vgg_full_complex_spectrogram_metrics.json`
 - `outputs/50_evaluation_comparison/50_noisy_drone_rf_v2_eval_metrics.json`
-- `results/noisy_drone_rf_v2/snr20_class_sweep_results.md`
+- `results/cards/README.md`
 
 ## Headline Metrics
 
@@ -88,7 +88,7 @@ The live OTA report uses SDR replay/receive and is not directly comparable to of
 
 ## Latency Target
 
-The live script reports per-window inference latency and throughput. The practical target is interactive single-window classification on a workstation or accelerated edge device; hard real-time latency is not guaranteed until benchmarked on the target platform.
+The public ONNX/TensorRT helpers report inference latency and throughput. The practical target is interactive single-window classification on a workstation or accelerated edge device; hard real-time latency is not guaranteed until benchmarked on the target platform.
 
 ## Export / Deployment Status
 

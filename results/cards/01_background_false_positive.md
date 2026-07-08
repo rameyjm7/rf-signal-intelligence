@@ -8,12 +8,12 @@ Show that the deployed NoisyDroneRF classifier rejects non-drone/background RF a
 
 - Receiver: Jetson + bladeRF through local `sdr-gateway`
 - Model backend: TensorRT FP16 NoisyDroneRF classifier
-- Event path: gateway IQ -> framing/preprocessing -> TensorRT inference -> quality/confidence gates -> JSONL events
+- Event path: gateway IQ -> private framing/preprocessing -> TensorRT inference -> quality/confidence gates -> structured events
 - Tested conditions: Wi-Fi-heavy 2.4 GHz, Bluetooth-heavy 2.4 GHz, random 2.4 GHz background, and longer no-drone soak
 
 ## Method
 
-Each condition captured live RF through the Jetson receiver path and generated JSONL RFML events. A detection counted as an alert only when the final event type was `rfml.noisy_drone.detection`; background rejection expected `rfml.noisy_drone.no_alert`.
+Each condition captured live RF through the Jetson receiver path and generated structured RFML events. A detection counted as an alert only when the final event type was a drone detection; background rejection expected a no-alert event.
 
 ## Metrics
 
@@ -34,6 +34,6 @@ Aggregate: 240 background events, 0 drone alerts.
 
 ## Artifacts
 
-- `results/noisy_drone_rf_v2/background_matrix/expanded_background_matrix_summary.json`
-- `results/noisy_drone_rf_v2/background_matrix/*.jsonl`
 - `results/noisy_drone_rf_v2/background_2470_false_positive_summary.md`
+- `results/noisy_drone_rf_v2/background_matrix/expanded_background_matrix_summary.md`
+- Private archive: raw event logs and replay/capture artifacts.

@@ -2,7 +2,7 @@
 
 ## Objective
 
-Verify that the Jetson RFML receiver detects a known labeled drone-controller signal over the air, while rejecting background before and after transmission. Preserve received IQ for later replay/regression.
+Verify that the Jetson RFML receiver detects a known labeled drone-controller signal over the air, while rejecting background before and after transmission. Private received IQ was preserved for later replay/regression.
 
 ## Setup and Hardware
 
@@ -11,11 +11,11 @@ Verify that the Jetson RFML receiver detects a known labeled drone-controller si
 - Test class: FutabaT14
 - Frequency: 2470 MHz
 - Sample rate / bandwidth: 20 MHz / 20 MHz
-- RX gates: `min_snr_db=5`, `min_detection_confidence=0.9`
+- RX gates: private validated quality/confidence policy
 
 ## Method
 
-The session used three phases: no-TX background, FutabaT14 OTA file replay, and no-TX recovery. Each classified report saved the received IQ capture to `report_*.npy` and emitted a JSON event.
+The session used three phases: no-TX background, FutabaT14 OTA file replay, and no-TX recovery. Each classified report saved a private received IQ capture and emitted a structured event.
 
 ## Metrics
 
@@ -30,12 +30,10 @@ Aggregate: 12/12 reports matched expected behavior.
 ## Limitations
 
 - This is OTA replay of a labeled dataset clip, not a live physical Futaba controller test.
-- Confidence gating is part of the result and should be preserved in operational settings unless revalidated.
+- Confidence gating is part of the private operational result and should be preserved in operational settings unless revalidated.
 - Raw IQ captures are large and intentionally kept out of Git.
 
 ## Artifacts
 
-- `results/noisy_drone_rf_v2/fn_pc_gated_20260708T143312Z/result_card.md`
-- `results/noisy_drone_rf_v2/fn_pc_gated_20260708T143312Z/replay_manifest.json`
-- `results/noisy_drone_rf_v2/fn_pc_gated_20260708T143312Z/*/events.jsonl`
-- Local replay IQ: `results/noisy_drone_rf_v2/fn_pc_gated_20260708T143312Z/*/iq/*.npy`
+- `results/cards/03_ota_futaba14_positive_control.md`
+- Private archive: replay manifest, structured event logs, and received IQ captures.

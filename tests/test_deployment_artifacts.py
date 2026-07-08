@@ -66,23 +66,13 @@ def test_local_onnx_inference_script_exposes_expected_flags():
         assert flag in text
 
 
-def test_gateway_rx_classifier_exposes_jetson_event_flags():
-    text = (REPO_ROOT / "scripts/noisy_drone_gateway_rx_classifier.py").read_text(encoding="utf-8")
+def test_public_repo_notes_private_live_gateway_tooling():
+    text = (REPO_ROOT / "docs/jetson_tensorrt_deployment.md").read_text(encoding="utf-8")
 
-    for flag in [
-        "--backend",
-        "--engine",
-        "--continuous",
-        "--duration-sec",
-        "--max-reports",
-        "--save-iq-dir",
-        "--min-detection-confidence",
-        "--event-jsonl",
-        "--run-id",
-        "--frequency-offsets-hz",
-        "event-json",
-        "end_to_end",
-        "preprocess",
-        "inference",
+    for phrase in [
+        "validated privately",
+        "production SDR gateway classifier",
+        "tuned framing logic",
+        "licensed private tooling",
     ]:
-        assert flag in text
+        assert phrase in text

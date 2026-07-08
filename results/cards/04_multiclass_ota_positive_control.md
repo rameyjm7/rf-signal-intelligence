@@ -12,7 +12,7 @@ Demonstrate proposal-ready NoisyDroneRF classification coverage by replaying rep
 - Sample rate / bandwidth: 20 MHz / 20 MHz
 - Backend: TensorRT FP16
 - Reports per phase: 3
-- Gates: `min_snr_db=5`, `min_detection_confidence=0.9`
+- Gates: private validated quality/confidence policy
 
 ## Method
 
@@ -41,6 +41,5 @@ Aggregate: 24/24 reports matched expected behavior; 18/18 positive controls were
 
 ## Artifacts
 
-- `results/noisy_drone_rf_v2/multiclass_pc_20260708T145502Z/proposal_report.md`
-- `results/noisy_drone_rf_v2/multiclass_pc_20260708T145502Z/proposal_table.csv`
+- `results/cards/04_multiclass_ota_positive_control.md`
 - Private regression archive: replay manifest, event logs, TX/RX logs, and received IQ captures.

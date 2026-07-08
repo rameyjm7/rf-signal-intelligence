@@ -20,7 +20,7 @@ The dataset file count depends on the local dataset directory. Current committed
 
 - 649 natural held-out test samples after `min_snr_db=-6`, `data_fraction=0.25`, and `test_size=0.20`.
 - 203 balanced held-out test samples, 29 per class.
-- 70 live OTA replay/receive trials in `results/noisy_drone_rf_v2/snr20_class_sweep_results.md`.
+- Public aggregate OTA evidence is summarized in `results/cards/README.md`; detailed replay artifacts are private.
 
 ## Preprocessing Assumptions
 

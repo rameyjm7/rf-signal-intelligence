@@ -7,13 +7,12 @@ per-trial predictions, and links to generated waterfall snapshots under `outputs
 
 ## NoisyDroneRFv2
 
-- [70-trial SNR >= 20 dB OTA class sweep](noisy_drone_rf_v2/snr20_class_sweep_results.md)
-- [Initial OTA class sweep](noisy_drone_rf_v2/class_sweep_results.md)
+- [Public RFML result cards](cards/README.md)
 - [Jetson TensorRT benchmark/profile summary](benchmarks/noisy_drone_tensorrt_jetson.md)
 
 ## RML2016
 
-- [RML2016 class sweep results](rml2016/class_sweep_results.md)
+- RML2016 class sweep details are retained as historical research evidence.
 
 ## Offline Result Index
 

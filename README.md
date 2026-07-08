@@ -79,15 +79,9 @@ Hardware setup:
 | Dataset | NoisyDroneRFv2 |
 | Model | VGG full-complex spectrogram |
 
-Representative live RX waterfall/classification overlays:
-
-| DJI live OTA classification | Taranis live OTA classification |
-|---|---|
-| ![DJI live OTA waterfall classification](results/noisy_drone_rf_v2/snr20_waterfalls/001_DJI_waterfall.png) | ![Taranis live OTA waterfall classification](results/noisy_drone_rf_v2/snr20_waterfalls/052_Taranis_waterfall.png) |
-
 Full evidence:
 
-- [70-trial OTA SDR-to-SDR sweep report](results/noisy_drone_rf_v2/snr20_class_sweep_results.md)
+- [Public RFML result cards](results/cards/README.md)
 - [NoisyDroneRFv2 result card](docs/results/noisy_drone_rf_v2/README.md)
 - [Jetson TensorRT benchmark/profile summary](results/benchmarks/noisy_drone_tensorrt_jetson.md)
 
@@ -226,71 +220,36 @@ Legacy RML2016 entrypoint:
 rf-signal-intelligence --mode evaluate_only
 ```
 
-## Live RF Classifier
+## Bring-Your-Own IQ Inference
 
-Run the NoisyDroneRFv2 model against IQ playback, live SDR receive, or SDR-to-SDR over-the-air replay.
+The public repository includes generic IQ loading, spectrogram preprocessing,
+ONNX export, and local ONNX Runtime inference helpers. Production live-SDR
+framing, gateway integration, tuned confidence gates, OTA replay tooling, and
+validated commercial model artifacts are maintained privately.
 
 ```text
-IQ source -> windowing -> preprocessing/spectrogram -> model inference -> class/confidence -> latency/throughput reporting
+user IQ/model -> public preprocessing/export helpers -> local inference report
 ```
 
-IQ file playback:
+Example with local/private artifacts:
 
 ```bash
-python scripts/live_noisy_drone_rf_classifier.py \
-  --iq-file outputs/rx_debug.npy \
-  --model models/noisy_drone_rf_v2/noisy_drone_rf_v2_vgg_full_complex_spectrogram_best.keras \
+ONNX_MODEL=/path/to/private/model.onnx \
+SAMPLE_INPUT=/path/to/private/sample_input.npy \
+models/noisy_drone_rf_v2/run_onnx_inference.sh --providers CPUExecutionProvider
+```
+
+IQ file playback with a local/private ONNX model:
+
+```bash
+python exports/run_onnx_inference.py \
+  --onnx /path/to/private/model.onnx \
+  --iq-file /path/to/local/capture.npy \
+  --labels models/noisy_drone_rf_v2/labels.json \
   --window-samples 1048576 \
   --nfft 1024 \
   --hop 1024 \
-  --time-bins 1024 \
-  --once
-```
-
-Live SDR receive with SoapySDR:
-
-```bash
-python scripts/live_noisy_drone_rf_classifier.py \
-  --device-args driver=hackrf \
-  --freq 2.399e9 \
-  --sample-rate 20e6 \
-  --bandwidth 20e6 \
-  --gain 60 \
-  --model models/noisy_drone_rf_v2/noisy_drone_rf_v2_vgg_full_complex_spectrogram_best.keras
-```
-
-SDR-to-SDR replay and receive demo:
-
-```bash
-python scripts/live_noisy_drone_rf_classifier.py \
-  --tx \
-  --tx-dataset-dir /data/rameyjm7/datasets/NoisyDroneRFv2 \
-  --tx-class-name DJI \
-  --tx-min-snr 24 \
-  --device-args driver=hackrf \
-  --tx-device-args driver=bladerf \
-  --freq 2.399e9 \
-  --sample-rate 20e6 \
-  --bandwidth 20e6 \
-  --tx-bandwidth 20e6 \
-  --gain 60 \
-  --tx-gain 60 \
-  --once \
-  --save-rx-iq outputs/rx_debug.npy
-```
-
-Reproduce the documented OTA class sweep:
-
-```bash
-python scripts/live_noisy_drone_rf_classifier.py \
-  --tx-test-all-classes \
-  --tx-test-classes DJI,FutabaT14,FutabaT7,Graupner,Noise,Taranis,Turnigy \
-  --tx-test-count 10 \
-  --tx-min-snr 20 \
-  --tx-test-output-csv outputs/noisy_drone_rf_v2_snr20_class_sweep.csv \
-  --tx-test-output-md results/noisy_drone_rf_v2/snr20_class_sweep_results.md \
-  --tx-test-save-rx-dir outputs/noisy_drone_rf_v2_snr20_iq \
-  --tx-test-save-plots-dir results/noisy_drone_rf_v2/snr20_waterfalls
+  --time-bins 1024
 ```
 
 ## Jetson TensorRT Deployment
@@ -307,7 +266,7 @@ Keras model -> ONNX export -> TensorRT FP16 engine -> Jetson inference -> trtexe
 | TensorRT `trtexec` throughput | 12.58 qps |
 | Direct TensorRT class validation | 7/7 classes matched |
 | Nsight Systems profile | Captured and summarized |
-| Live gateway-to-TensorRT event path | Implemented with JSONL output |
+| Live gateway-to-TensorRT event path | Validated privately with JSON event output |
 
 Runtime comparison:
 
@@ -321,8 +280,7 @@ See:
 
 - [Jetson TensorRT deployment guide](docs/jetson_tensorrt_deployment.md)
 - [Jetson TensorRT benchmark/profile summary](results/benchmarks/noisy_drone_tensorrt_jetson.md)
-- [Jetson end-to-end JSON event demo](results/benchmarks/noisy_drone_jetson_end_to_end_demo.md)
-- [Background false-positive test protocol](results/noisy_drone_rf_v2/background_false_positive_test.md)
+- [Public RFML result cards](results/cards/README.md)
 
 ## Testing
 
